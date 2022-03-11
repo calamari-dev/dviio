@@ -5,7 +5,7 @@ import { Mode, dviReducer } from "../../common/src";
 import { parseDvi } from "./parseDvi";
 import { FontLoader } from "./FontLoader";
 
-export { dviRenderer } from "../../common/src";
+export { dviio } from "../../common/src";
 
 export const TeX82: Mode<Blob, Root, string> = {
   initializer: () => ({ extension: {}, page: x() }),

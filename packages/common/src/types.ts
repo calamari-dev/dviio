@@ -78,7 +78,11 @@ export type DviInstruction =
   | { name: "EOP" }
   | { name: "PUSH" }
   | { name: "POP" }
-  | { name: "RIGHT"; movement: number }
+  | { name: "RIGHT"; movement?: number }
+  | { name: "X"; movement?: number }
+  | { name: "DOWN"; movement: number }
+  | { name: "Y"; movement?: number }
+  | { name: "Z"; movement?: number }
   | { name: "FNT"; fontIndex: number }
   | { name: "XXX"; k: number; x: string }
   | {
@@ -113,10 +117,11 @@ export type DviInstruction =
       name: "POST_POST";
       version: number;
       postIndex: number;
-    };
+    }
+  | { name: "UNDEFINED"; opcode: number };
 
 export type SpecialInstruction = {
-  name: "SPECIAL_BEGIN_LINK";
+  name: "$BEGIN_LINK";
 };
 
 export type XdvOnlyInstruction =

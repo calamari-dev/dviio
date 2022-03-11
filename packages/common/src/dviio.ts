@@ -7,13 +7,7 @@ type Config<Input, Page, Output, Inst extends Instruction, Ext> = {
   plugin?: Plugin[];
 };
 
-export const dviRenderer = async <
-  Input,
-  Page,
-  Output,
-  Inst extends Instruction,
-  Ext
->(
+export const dviio = async <Input, Page, Output, Inst extends Instruction, Ext>(
   input: Input,
   { mode, page, plugin = [] }: Config<Input, Page, Output, Inst, Ext>
 ): Promise<Output> => {

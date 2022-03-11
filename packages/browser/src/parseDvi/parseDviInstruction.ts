@@ -7,8 +7,87 @@ export const parseDviInstruction = async (
   const buffer = await blob.slice(index, index + 1).arrayBuffer();
   const opcode = new DataView(buffer).getUint8(0);
 
+  if (opcode <= 151) {
+    return { byteLength: 1, inst: { name: "NOP" } };
+  }
+
+  // X0
+  if (opcode === 152) {
+    return { byteLength: 1, inst: { name: "X" } };
+  }
+
+  // X1, ..., X4
+  if (opcode <= 156) {
+    const i = opcode - 152;
+    const buffer = await blob.slice(index + 1, index + 1 + i).arrayBuffer();
+    const view = new DataView(buffer);
+
+    return {
+      byteLength: i + 1,
+      inst: { name: "X", movement: getUint(view, i) },
+    };
+  }
+
+  // DOWN
+  if (opcode <= 160) {
+    const i = opcode - 156;
+    const buffer = await blob.slice(index + 1, index + 1 + i).arrayBuffer();
+    const view = new DataView(buffer);
+
+    return {
+      byteLength: i + 1,
+      inst: { name: "DOWN", movement: getUint(view, i) },
+    };
+  }
+
+  // Y0
+  if (opcode === 161) {
+    return { byteLength: 1, inst: { name: "Y" } };
+  }
+
+  // Y1, ..., Y4
+  if (opcode <= 165) {
+    const i = opcode - 161;
+    const buffer = await blob.slice(index + 1, index + 1 + i).arrayBuffer();
+    const view = new DataView(buffer);
+
+    return {
+      byteLength: i + 1,
+      inst: { name: "Y", movement: getUint(view, i) },
+    };
+  }
+
+  // Z0
+  if (opcode === 166) {
+    return { byteLength: 1, inst: { name: "Z" } };
+  }
+
+  // Z1, ..., Z4
+  if (opcode <= 170) {
+    const i = opcode - 166;
+    const buffer = await blob.slice(index + 1, index + 1 + i).arrayBuffer();
+    const view = new DataView(buffer);
+
+    return {
+      byteLength: i + 1,
+      inst: { name: "Z", movement: getUint(view, i) },
+    };
+  }
+
+  // FNT_NUM
+  if (opcode <= 234) {
+    const i = opcode - 234;
+    const buffer = await blob.slice(index + 1, index + 1 + i).arrayBuffer();
+    const view = new DataView(buffer);
+
+    return {
+      byteLength: i + 1,
+      inst: { name: "FNT", fontIndex: getUint(view, i) },
+    };
+  }
+
   // FNT
-  if (opcode >= 235 && opcode <= 238) {
+  if (opcode <= 238) {
     const i = opcode - 234;
     const buffer = await blob.slice(index + 1, index + 1 + i).arrayBuffer();
     const view = new DataView(buffer);
@@ -20,12 +99,12 @@ export const parseDviInstruction = async (
   }
 
   // XXX
-  if (opcode >= 239 && opcode <= 242) {
+  if (opcode <= 242) {
     // yet
   }
 
   // FNT_DEF
-  if (opcode >= 243 && opcode <= 246) {
+  if (opcode <= 246) {
     const i = opcode - 242;
     const buffer = await blob.slice(index + 1, index + i + 15).arrayBuffer();
     const view = new DataView(buffer);
@@ -104,22 +183,23 @@ export const parseDviInstruction = async (
     };
   }
 
-  return {
-    byteLength: 0,
-    inst: { name: "NOP" },
-  };
+  return { byteLength: 1, inst: { name: "UNDEFINED", opcode } };
 };
 
-const getUint = (view: DataView, byteLength: number): number => {
+const getUint = (
+  view: DataView,
+  byteLength: number,
+  byteOffset = 0
+): number => {
   switch (byteLength) {
     case 1:
-      return view.getUint8(0);
+      return view.getUint8(byteOffset);
     case 2:
-      return view.getUint16(0);
+      return view.getUint16(byteOffset);
     case 3:
-      return 65536 * view.getUint8(0) + view.getUint16(4);
+      return 65536 * view.getUint8(byteOffset) + view.getUint16(byteOffset + 4);
     case 4:
-      return view.getUint32(0);
+      return view.getUint32(byteOffset);
   }
 
   return -1;
