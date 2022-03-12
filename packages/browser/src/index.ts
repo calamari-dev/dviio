@@ -7,7 +7,7 @@ import { FontLoader } from "./FontLoader";
 
 export { dviio } from "../../common/src";
 
-export const TeX82: Mode<Blob, Root, string> = {
+export const tex82: Mode<Blob, Root, string> = {
   initializer: () => ({ extension: {}, page: x() }),
   parser: parseDvi,
   loader: FontLoader,

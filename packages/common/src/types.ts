@@ -121,9 +121,15 @@ export type DviInstruction =
     }
   | { name: "UNDEFINED"; opcode: number };
 
-export type SpecialInstruction = {
-  name: "$BEGIN_LINK";
-};
+export type SpecialInstruction =
+  | {
+      name: "$BEGIN_EXTERNAL_LINK";
+      href: string;
+    }
+  | {
+      name: "$BEGIN_LINK_TARGET";
+      label: string;
+    };
 
 export type XdvOnlyInstruction =
   | {
