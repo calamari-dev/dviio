@@ -1,35 +1,58 @@
 type HtmlTag =
-  | { type: "open"; tagName: string; attribute?: Record<string, string> }
+  | { type: "open"; tagName: string; attribute?: { [T in string]?: string } }
   | { type: "close"; tagName: string }
   | { type: "invalid" };
 
 export const parseHtmlTag = (x: string): HtmlTag => {
+  if (x.slice(0, 1) !== "<" || x.slice(-1) !== ">") {
+    return { type: "invalid" };
+  }
+
   if (x.slice(0, 2) === "</") {
-    return { type: "close", tagName: x.slice(2, -1) };
+    const tagName = x.slice(2, -1).toLowerCase();
+
+    if (/[^a-zA-Z-]/.test(tagName)) {
+      return { type: "invalid" };
+    }
+
+    return { type: "close", tagName };
   }
 
-  if (x.slice(0, 1) !== "<") {
+  x = x.slice(1, x.length - 1);
+  const tagName = (/^[a-zA-Z-]+/.exec(x) || [""])[0].toLowerCase();
+
+  if (tagName === "") {
     return { type: "invalid" };
   }
 
-  const match = x.match(openTag) || [];
-  let [, tagName, name] = match;
-  const value = (match[3] || "") + (match[4] || "") + (match[5] || "");
+  const attribute: { [T in string]?: string } = {};
+  x = x.slice(tagName.length).trim();
 
-  if (!tagName) {
-    return { type: "invalid" };
-  }
-
-  tagName = tagName.toLowerCase();
-
-  if (!name) {
+  if (x === "") {
     return { type: "open", tagName };
   }
 
-  name = name.toLowerCase();
-  return { type: "open", tagName, attribute: { [name]: value } };
-};
+  while (x !== "") {
+    const match = x.match(/^(?:[a-zA-Z-]+(?:="[^"]*"|='[^']*'|=[^"'=<>`]+)?)/);
 
-// https://html.spec.whatwg.org/multipage/syntax.html#start-tags
-const openTag =
-  /^(?:<([A-Za-z0-9]+)(?:[\t\n\f\r ]+([a-zA-Z]+)(?:(?:="([^"]*?)")|(?:='([^']*?)')|(?:=([^"'=<>`]+)))?)?>)/;
+    if (!match) {
+      return { type: "invalid" };
+    }
+
+    const attr = match[0];
+    const eqIdx = attr.indexOf("=");
+    x = x.slice(attr.length).trim();
+
+    if (eqIdx === -1) {
+      attribute[attr.toLowerCase()] = "";
+      continue;
+    }
+
+    const name = attr.slice(0, eqIdx).toLowerCase();
+    attribute[name] = /["']/.test(attr.slice(-1))
+      ? attr.slice(eqIdx + 2, attr.length - 1)
+      : attr.slice(eqIdx + 1);
+  }
+
+  return { type: "open", tagName, attribute };
+};
