@@ -7,8 +7,37 @@ export const parseDviInstruction = async (
   const buffer = await blob.slice(index, index + 1).arrayBuffer();
   const opcode = new DataView(buffer).getUint8(0);
 
-  if (opcode <= 151) {
+  if (opcode <= 142) {
     return { byteLength: 1, inst: { name: "NOP" } };
+  }
+
+  // RIGHT
+  if (opcode <= 146) {
+    const i = opcode - 142;
+    const buffer = await blob.slice(index + 1, index + 1 + i).arrayBuffer();
+    const view = new DataView(buffer);
+
+    return {
+      byteLength: i + 1,
+      inst: { name: "RIGHT", movement: getUint(view, i) },
+    };
+  }
+
+  // W0
+  if (opcode === 147) {
+    return { byteLength: 1, inst: { name: "W" } };
+  }
+
+  // W1, ..., W4
+  if (opcode <= 151) {
+    const i = opcode - 147;
+    const buffer = await blob.slice(index + 1, index + 1 + i).arrayBuffer();
+    const view = new DataView(buffer);
+
+    return {
+      byteLength: i + 1,
+      inst: { name: "W", movement: getUint(view, i) },
+    };
   }
 
   // X0
@@ -76,14 +105,8 @@ export const parseDviInstruction = async (
 
   // FNT_NUM
   if (opcode <= 234) {
-    const i = opcode - 234;
-    const buffer = await blob.slice(index + 1, index + 1 + i).arrayBuffer();
-    const view = new DataView(buffer);
-
-    return {
-      byteLength: i + 1,
-      inst: { name: "FNT", fontIndex: getUint(view, i) },
-    };
+    const fontIndex = opcode - 171;
+    return { byteLength: 1, inst: { name: "FNT", fontIndex } };
   }
 
   // FNT
@@ -100,7 +123,18 @@ export const parseDviInstruction = async (
 
   // XXX
   if (opcode <= 242) {
-    // yet
+    const i = opcode - 238;
+    const buffer = await blob.slice(index + 1, index + 1 + i).arrayBuffer();
+    const view = new DataView(buffer);
+    const k = getUint(view, i);
+
+    return {
+      byteLength: i + k + 1,
+      inst: {
+        name: "XXX",
+        x: await blob.slice(index + i + 1, index + i + k + 1).text(),
+      },
+    };
   }
 
   // FNT_DEF
@@ -197,7 +231,7 @@ const getUint = (
     case 2:
       return view.getUint16(byteOffset);
     case 3:
-      return 65536 * view.getUint8(byteOffset) + view.getUint16(byteOffset + 4);
+      return 65536 * view.getUint8(byteOffset) + view.getUint16(byteOffset + 1);
     case 4:
       return view.getUint32(byteOffset);
   }

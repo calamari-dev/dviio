@@ -69,22 +69,23 @@ export type Instruction = { name: string };
 
 export type DviInstruction =
   | SpecialInstruction
-  | { name: "SET_CHAR"; codePoint: number }
+  | { name: "SET"; codePoint: number }
   | { name: "SET_RULE"; width: number; height: number }
-  | { name: "PUT_CHAR"; codePoint: number }
+  | { name: "PUT"; codePoint: number }
   | { name: "PUT_RULE"; width: number; height: number }
   | { name: "NOP" }
   | { name: "BOP" }
   | { name: "EOP" }
   | { name: "PUSH" }
   | { name: "POP" }
-  | { name: "RIGHT"; movement?: number }
+  | { name: "RIGHT"; movement: number }
+  | { name: "W"; movement?: number }
   | { name: "X"; movement?: number }
   | { name: "DOWN"; movement: number }
   | { name: "Y"; movement?: number }
   | { name: "Z"; movement?: number }
   | { name: "FNT"; fontIndex: number }
-  | { name: "XXX"; k: number; x: string }
+  | { name: "XXX"; x: string }
   | {
       name: "FNT_DEF";
       fontIndex: number;
