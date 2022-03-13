@@ -4,11 +4,13 @@ type HtmlTag =
   | { type: "invalid" };
 
 export const parseHtmlTag = (x: string): HtmlTag => {
-  if (x.slice(0, 1) !== "<" || x.slice(-1) !== ">") {
+  x = x.trim();
+
+  if (x[0] !== "<" || x[x.length - 1] !== ">") {
     return { type: "invalid" };
   }
 
-  if (x.slice(0, 2) === "</") {
+  if (x[1] === "/") {
     const tagName = x.slice(2, -1).toLowerCase();
 
     if (/[^a-zA-Z-]/.test(tagName)) {
@@ -49,7 +51,7 @@ export const parseHtmlTag = (x: string): HtmlTag => {
     }
 
     const name = attr.slice(0, eqIdx).toLowerCase();
-    attribute[name] = /["']/.test(attr.slice(-1))
+    attribute[name] = /["']/.test(attr[attr.length - 1])
       ? attr.slice(eqIdx + 2, attr.length - 1)
       : attr.slice(eqIdx + 1);
   }

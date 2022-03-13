@@ -74,7 +74,22 @@ export type DviInstruction =
   | { name: "PUT"; codePoint: number }
   | { name: "PUT_RULE"; width: number; height: number }
   | { name: "NOP" }
-  | { name: "BOP" }
+  | {
+      name: "BOP";
+      bopIndex: number;
+      count: [
+        number,
+        number,
+        number,
+        number,
+        number,
+        number,
+        number,
+        number,
+        number,
+        number
+      ];
+    }
   | { name: "EOP" }
   | { name: "PUSH" }
   | { name: "POP" }
@@ -128,7 +143,10 @@ export type SpecialInstruction =
     }
   | {
       name: "$BEGIN_LINK_TARGET";
-      label: string;
+      htmlName: string;
+    }
+  | {
+      name: "$END_LINK";
     };
 
 export type XdvOnlyInstruction =

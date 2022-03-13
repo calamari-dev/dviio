@@ -18,8 +18,12 @@ export const hyperTexPlugin: Plugin = ({ x }) => {
 
     if ("name" in attribute) {
       const { name = "" } = attribute;
-      return { name: "$BEGIN_LINK_TARGET", label: name };
+      return { name: "$BEGIN_LINK_TARGET", htmlName: name };
     }
+  }
+
+  if (result.type === "close" && result.tagName === "a") {
+    return { name: "$END_LINK" };
   }
 
   return null;

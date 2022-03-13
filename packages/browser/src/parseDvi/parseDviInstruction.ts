@@ -7,8 +7,95 @@ export const parseDviInstruction = async (
   const buffer = await blob.slice(index, index + 1).arrayBuffer();
   const opcode = new DataView(buffer).getUint8(0);
 
-  if (opcode <= 142) {
+  // SET_CHAR_#
+  if (opcode <= 127) {
+    return { byteLength: 1, inst: { name: "SET", codePoint: opcode } };
+  }
+
+  // SET
+  if (opcode <= 131) {
+    const i = opcode - 127;
+    const buffer = await blob.slice(index + 1, index + 1 + i).arrayBuffer();
+    const view = new DataView(buffer);
+
+    return {
+      byteLength: i + 1,
+      inst: { name: "SET", codePoint: getUint(view, i) },
+    };
+  }
+
+  // SET_RULE
+  if (opcode === 132) {
+    const buffer = await blob.slice(index + 1, index + 9).arrayBuffer();
+    const view = new DataView(buffer);
+
+    return {
+      byteLength: 9,
+      inst: {
+        name: "SET_RULE",
+        height: view.getInt32(0),
+        width: view.getInt32(4),
+      },
+    };
+  }
+
+  // PUT
+  if (opcode <= 136) {
+    const i = opcode - 132;
+    const buffer = await blob.slice(index + 1, index + 1 + i).arrayBuffer();
+    const view = new DataView(buffer);
+
+    return {
+      byteLength: i + 1,
+      inst: { name: "PUT", codePoint: getUint(view, i) },
+    };
+  }
+
+  // PUT_RULE
+  if (opcode === 137) {
+    const buffer = await blob.slice(index + 1, index + 9).arrayBuffer();
+    const view = new DataView(buffer);
+
+    return {
+      byteLength: 9,
+      inst: {
+        name: "PUT_RULE",
+        height: view.getInt32(0),
+        width: view.getInt32(4),
+      },
+    };
+  }
+
+  // NOP
+  if (opcode === 138) {
     return { byteLength: 1, inst: { name: "NOP" } };
+  }
+
+  // BOP
+  if (opcode === 139) {
+    const buffer = await blob.slice(index + 1, index + 45).arrayBuffer();
+    const view = new DataView(buffer);
+    const count = [] as unknown as (DviInstruction & { name: "BOP" })["count"];
+
+    for (let i = 0; i < 10; i++) {
+      count[i] = view.getInt32(4 * i);
+    }
+
+    return {
+      byteLength: 45,
+      inst: { name: "BOP", bopIndex: view.getInt32(40), count },
+    };
+  }
+
+  switch (opcode) {
+    case 140: // EOP
+      return { byteLength: 1, inst: { name: "EOP" } };
+
+    case 141: // PUSH
+      return { byteLength: 1, inst: { name: "PUSH" } };
+
+    case 142: // POP
+      return { byteLength: 1, inst: { name: "POP" } };
   }
 
   // RIGHT
@@ -19,7 +106,7 @@ export const parseDviInstruction = async (
 
     return {
       byteLength: i + 1,
-      inst: { name: "RIGHT", movement: getUint(view, i) },
+      inst: { name: "RIGHT", movement: getInt(view, i) },
     };
   }
 
@@ -36,7 +123,7 @@ export const parseDviInstruction = async (
 
     return {
       byteLength: i + 1,
-      inst: { name: "W", movement: getUint(view, i) },
+      inst: { name: "W", movement: getInt(view, i) },
     };
   }
 
@@ -53,7 +140,7 @@ export const parseDviInstruction = async (
 
     return {
       byteLength: i + 1,
-      inst: { name: "X", movement: getUint(view, i) },
+      inst: { name: "X", movement: getInt(view, i) },
     };
   }
 
@@ -65,7 +152,7 @@ export const parseDviInstruction = async (
 
     return {
       byteLength: i + 1,
-      inst: { name: "DOWN", movement: getUint(view, i) },
+      inst: { name: "DOWN", movement: getInt(view, i) },
     };
   }
 
@@ -82,7 +169,7 @@ export const parseDviInstruction = async (
 
     return {
       byteLength: i + 1,
-      inst: { name: "Y", movement: getUint(view, i) },
+      inst: { name: "Y", movement: getInt(view, i) },
     };
   }
 
@@ -99,7 +186,7 @@ export const parseDviInstruction = async (
 
     return {
       byteLength: i + 1,
-      inst: { name: "Z", movement: getUint(view, i) },
+      inst: { name: "Z", movement: getInt(view, i) },
     };
   }
 
@@ -152,10 +239,10 @@ export const parseDviInstruction = async (
       byteLength: i + 15 + a + l,
       inst: {
         name: "FNT_DEF",
+        fontIndex: getUint(view, i),
         checksum: view.getUint32(i),
         scaleFactor: view.getUint32(i + 4),
         designSize: view.getUint32(i + 8),
-        fontIndex: getUint(view, i),
         directory: path.slice(0, a),
         filename: path.slice(a),
       },
@@ -194,8 +281,8 @@ export const parseDviInstruction = async (
         numer: view.getUint32(4),
         denom: view.getUint32(8),
         mag: view.getUint32(12),
-        maxHeight: view.getUint32(16),
-        maxWidth: view.getUint32(20),
+        maxHeight: view.getInt32(16),
+        maxWidth: view.getInt32(20),
         stackDepth: view.getUint16(24),
         totalPages: view.getUint16(26),
       },
@@ -220,20 +307,39 @@ export const parseDviInstruction = async (
   return { byteLength: 1, inst: { name: "UNDEFINED", opcode } };
 };
 
-const getUint = (
-  view: DataView,
-  byteLength: number,
-  byteOffset = 0
-): number => {
+const getInt = (view: DataView, byteLength: number): number => {
   switch (byteLength) {
     case 1:
-      return view.getUint8(byteOffset);
+      return view.getInt8(0);
     case 2:
-      return view.getUint16(byteOffset);
-    case 3:
-      return 65536 * view.getUint8(byteOffset) + view.getUint16(byteOffset + 1);
+      return view.getInt16(0);
     case 4:
-      return view.getUint32(byteOffset);
+      return view.getInt32(0);
+  }
+
+  if (byteLength === 3) {
+    let k = view.getUint16(1);
+    k += 0x10000 * view.getUint8(0);
+    return k < 0x800000 ? k : k - 0x1000000;
+  }
+
+  return -1;
+};
+
+const getUint = (view: DataView, byteLength: number): number => {
+  switch (byteLength) {
+    case 1:
+      return view.getUint8(0);
+    case 2:
+      return view.getUint16(0);
+    case 4:
+      return view.getUint32(0);
+  }
+
+  if (byteLength === 3) {
+    let k = view.getUint16(1);
+    k += 0x10000 * view.getUint8(0);
+    return k;
   }
 
   return -1;
