@@ -15,7 +15,7 @@ type TypeParams<T extends Record<string, Reducer<any, any, any>>> = {
 };
 
 /**
- * {@link Reducer} の組から合成された {@link Reducer} を計算する．
+ * Reducer の組から合成された Reducer を計算する．
  */
 export const combineReducers = <
   T extends Record<string, Reducer<any, any, any>>

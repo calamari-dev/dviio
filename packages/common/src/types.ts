@@ -1,3 +1,5 @@
+type Empty = { [T in string | number | symbol]: never };
+
 export type Mode<
   Input,
   Page,
@@ -18,7 +20,7 @@ export type Plugin = (
 
 export type Parser<Input, Inst extends Instruction = DviInstruction> = (
   input: Input,
-  plugin: Plugin[],
+  plugins: Plugin[],
   page: number
 ) => AsyncGenerator<DviInstruction | Inst, DviInstruction | Inst>;
 
@@ -43,7 +45,7 @@ export type Builder<Page, Output> = (page: Page) => Output;
 
 export type LoaderState<Ext = Empty> = Pick<
   State<unknown, Ext>,
-  "font" | "extension"
+  "fonts" | "extension"
 >;
 
 export type State<Page, Ext = Empty> = {
@@ -52,17 +54,16 @@ export type State<Page, Ext = Empty> = {
   numer: number;
   denom: number;
   mag: number;
-  font: { [T in number]?: FontDefinition };
   page: Page;
   extension: Ext;
-};
-
-type Empty = { [T in string | number | symbol]: never };
-
-type FontDefinition = {
-  checksum: number;
-  scaleFactor: number;
-  designSize: number;
+  fonts: {
+    [T in number]?: {
+      encoding?: string;
+      scaleFactor: number;
+      designSize: number;
+      metric: { [U in number]?: number };
+    };
+  };
 };
 
 export type Instruction = { name: string };

@@ -6,5 +6,5 @@ export const initialState: Omit<State<unknown>, "page" | "extension"> = {
   numer: 25400000,
   denom: 473628672,
   mag: 1000,
-  font: {},
+  fonts: {},
 };

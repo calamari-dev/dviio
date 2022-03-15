@@ -22,7 +22,7 @@ describe("parseHtmlTag", () => {
     assert.deepEqual(parseHtmlTag("<A\thref>"), {
       type: "open",
       tagName: "a",
-      attribute: { href: "" },
+      props: { href: "" },
     });
   });
 
@@ -30,7 +30,7 @@ describe("parseHtmlTag", () => {
     assert.deepEqual(parseHtmlTag("<a data-xyz=true>"), {
       type: "open",
       tagName: "a",
-      attribute: { "data-xyz": "true" },
+      props: { "data-xyz": "true" },
     });
   });
 
@@ -38,7 +38,7 @@ describe("parseHtmlTag", () => {
     assert.deepEqual(parseHtmlTag("<a HREF='http://example.org'>"), {
       type: "open",
       tagName: "a",
-      attribute: { href: "http://example.org" },
+      props: { href: "http://example.org" },
     });
   });
 
@@ -46,7 +46,7 @@ describe("parseHtmlTag", () => {
     assert.deepEqual(parseHtmlTag("<a  nAme=foo>"), {
       type: "open",
       tagName: "a",
-      attribute: { name: "foo" },
+      props: { name: "foo" },
     });
   });
 
@@ -54,7 +54,7 @@ describe("parseHtmlTag", () => {
     assert.deepEqual(parseHtmlTag('<a\nHREF="http://example.org"\tnAme=foo>'), {
       type: "open",
       tagName: "a",
-      attribute: { href: "http://example.org", name: "foo" },
+      props: { href: "http://example.org", name: "foo" },
     });
   });
 });

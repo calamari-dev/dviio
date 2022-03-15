@@ -1,11 +1,9 @@
 type HtmlTag =
-  | { type: "open"; tagName: string; attribute?: { [T in string]?: string } }
+  | { type: "open"; tagName: string; props?: { [T in string]?: string } }
   | { type: "close"; tagName: string }
   | { type: "invalid" };
 
 export const parseHtmlTag = (x: string): HtmlTag => {
-  x = x.trim();
-
   if (x[0] !== "<" || x[x.length - 1] !== ">") {
     return { type: "invalid" };
   }
@@ -27,7 +25,7 @@ export const parseHtmlTag = (x: string): HtmlTag => {
     return { type: "invalid" };
   }
 
-  const attribute: { [T in string]?: string } = {};
+  const props: { [T in string]?: string } = {};
   x = x.slice(tagName.length).trim();
 
   if (x === "") {
@@ -46,15 +44,15 @@ export const parseHtmlTag = (x: string): HtmlTag => {
     x = x.slice(attr.length).trim();
 
     if (eqIdx === -1) {
-      attribute[attr.toLowerCase()] = "";
+      props[attr.toLowerCase()] = "";
       continue;
     }
 
-    const name = attr.slice(0, eqIdx).toLowerCase();
-    attribute[name] = /["']/.test(attr[attr.length - 1])
+    const key = attr.slice(0, eqIdx).toLowerCase();
+    props[key] = /["']/.test(attr[attr.length - 1])
       ? attr.slice(eqIdx + 2, attr.length - 1)
       : attr.slice(eqIdx + 1);
   }
 
-  return { type: "open", tagName, attribute };
+  return { type: "open", tagName, props: props };
 };

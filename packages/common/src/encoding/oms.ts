@@ -1,0 +1,137 @@
+import type { Encoding } from "./types";
+
+/*\
+ * 以下は texucsmapping Package (https:// github.com/zr-tex8r/texucsmapping) の
+ * ファイル /bx-oms.txt を基に，一部改変を加えて作成した．
+\*/
+
+export const oms: Readonly<Encoding> = {
+  0x00: 0x2212, // (minus)MINUS SIGN
+  0x01: 0x22c5, // (dotmath)DOT OPERATOR
+  0x02: 0x00d7, // (multiply)MULTIPLICATION SIGN
+  0x03: 0x2217, // (asteriskmath)ASTERISK OPERATOR
+  0x04: 0x00f7, // (divide)DIVISION SIGN
+  0x05: 0x22c4, // DIAMOND OPERATOR
+  0x06: 0x00b1, // (plusminus)PLUS-MINUS SIGN
+  0x07: 0x2213, // MINUS-OR-PLUS SIGN
+  0x08: 0x2295, // (circleplus)CIRCLED PLUS
+  0x09: 0x2296, // CIRCLED MINUS
+  0x0a: 0x2297, // (circlemultiply)CIRCLED TIMES
+  0x0b: 0x2298, // CIRCLED DIVISION SLASH
+  0x0c: 0x2299, // CIRCLED DOT OPERATOR
+  0x0d: 0x25ef, // LARGE CIRCLE
+  0x0e: 0x2218, // RING OPERATOR
+  0x0f: 0x2219, // BULLET OPERATOR
+  0x10: 0x224d, // EQUIVALENT TO
+  0x11: 0x2261, // (equivalence)IDENTICAL TO
+  0x12: 0x2286, // (reflexsubset)SUBSET OF OR EQUAL TO
+  0x13: 0x2287, // (reflexsuperset)SUPERSET OF OR EQUAL TO
+  0x14: 0x2264, // (lessequal)LESS-THAN OR EQUAL TO
+  0x15: 0x2265, // (greaterequal)GREATER-THAN OR EQUAL TO
+  0x16: 0x227c, // PRECEDES OR EQUAL TO
+  0x17: 0x227d, // SUCCEEDS OR EQUAL TO
+  0x18: 0x223c, // (similar)TILDE OPERATOR
+  0x19: 0x2248, // (approxequal)ALMOST EQUAL TO
+  0x1a: 0x2282, // (propersubset)SUBSET OF
+  0x1b: 0x2283, // (propersuperset)SUPERSET OF
+  0x1c: 0x226a, // MUCH LESS-THAN
+  0x1d: 0x226b, // MUCH GREATER-THAN
+  0x1e: 0x227a, // PRECEDES
+  0x1f: 0x227b, // SUCCEEDS
+  0x20: 0x2190, // (arrowleft)LEFTWARDS ARROW
+  0x21: 0x2192, // (arrowright)RIGHTWARDS ARROW
+  0x22: 0x2191, // (arrowup)UPWARDS ARROW
+  0x23: 0x2193, // (arrowdown)DOWNWARDS ARROW
+  0x24: 0x2194, // (arrowboth)LEFT RIGHT ARROW
+  0x25: 0x2197, // NORTH EAST ARROW
+  0x26: 0x2198, // SOUTH EAST ARROW
+  0x27: 0x2243, // ASYMPTOTICALLY EQUAL TO
+  0x28: 0x21d0, // (arrowdblleft)LEFTWARDS DOUBLE ARROW
+  0x29: 0x21d2, // (arrowdblright)RIGHTWARDS DOUBLE ARROW
+  0x2a: 0x21d1, // (arrowdblup)UPWARDS DOUBLE ARROW
+  0x2b: 0x21d3, // (arrowdbldown)DOWNWARDS DOUBLE ARROW
+  0x2c: 0x21d4, // (arrowdblboth)LEFT RIGHT DOUBLE ARROW
+  0x2d: 0x2196, // NORTH WEST ARROW
+  0x2e: 0x2199, // SOUTH WEST ARROW
+  0x2f: 0x221d, // (proportional)PROPORTIONAL TO
+  0x30: 0x2032, // (minute)PRIME
+  0x31: 0x221e, // (infinity)INFINITY
+  0x32: 0x2208, // (element)ELEMENT OF
+  0x33: 0x220b, // (suchthat)CONTAINS AS MEMBER
+  0x34: 0x25b3, // WHITE UP-POINTING TRIANGLE
+  0x35: 0x25bd, // WHITE DOWN-POINTING TRIANGLE
+  0x36: 0x0338, // COMBINING LONG SOLIDUS OVERLAY
+  0x37: 0x237f, // VERTICAL LINE WITH MIDDLE DOT
+  0x38: 0x2200, // (universal)FOR ALL
+  0x39: 0x2203, // (existential)THERE EXISTS
+  0x3a: 0x00ac, // (logicalnot)NOT SIGN
+  0x3b: 0x2205, // (emptyset)EMPTY SET
+  0x3c: 0x211c, // (Rfraktur)BLACK-LETTER CAPITAL R
+  0x3d: 0x2111, // (Ifraktur)BLACK-LETTER CAPITAL I
+  0x3e: 0x22a4, // DOWN TACK
+  0x3f: 0x22a5, // (perpendicular)UP TACK
+  0x40: 0x2135, // (aleph)ALEF SYMBOL
+  0x41: 0x1d49c, // MATHEMATICAL SCRIPT CAPITAL A
+  0x42: 0x212c, // SCRIPT CAPITAL B
+  0x43: 0x1d49e, // MATHEMATICAL SCRIPT CAPITAL C
+  0x44: 0x1d49f, // MATHEMATICAL SCRIPT CAPITAL D
+  0x45: 0x2130, // SCRIPT CAPITAL E
+  0x46: 0x2131, // SCRIPT CAPITAL F
+  0x47: 0x1d4a2, // MATHEMATICAL SCRIPT CAPITAL G
+  0x48: 0x210b, // SCRIPT CAPITAL H
+  0x49: 0x2110, // SCRIPT CAPITAL I
+  0x4a: 0x1d4a5, // MATHEMATICAL SCRIPT CAPITAL J
+  0x4b: 0x1d4a6, // MATHEMATICAL SCRIPT CAPITAL K
+  0x4c: 0x2112, // SCRIPT CAPITAL L
+  0x4d: 0x2133, // SCRIPT CAPITAL M
+  0x4e: 0x1d4a9, // MATHEMATICAL SCRIPT CAPITAL N
+  0x4f: 0x1d4aa, // MATHEMATICAL SCRIPT CAPITAL O
+  0x50: 0x1d4ab, // MATHEMATICAL SCRIPT CAPITAL P
+  0x51: 0x1d4ac, // MATHEMATICAL SCRIPT CAPITAL Q
+  0x52: 0x211b, // SCRIPT CAPITAL R
+  0x53: 0x1d4ae, // MATHEMATICAL SCRIPT CAPITAL S
+  0x54: 0x1d4af, // MATHEMATICAL SCRIPT CAPITAL T
+  0x55: 0x1d4b0, // MATHEMATICAL SCRIPT CAPITAL U
+  0x56: 0x1d4b1, // MATHEMATICAL SCRIPT CAPITAL V
+  0x57: 0x1d4b2, // MATHEMATICAL SCRIPT CAPITAL W
+  0x58: 0x1d4b3, // MATHEMATICAL SCRIPT CAPITAL X
+  0x59: 0x1d4b4, // MATHEMATICAL SCRIPT CAPITAL Y
+  0x5a: 0x1d4b5, // MATHEMATICAL SCRIPT CAPITAL Z
+  0x5b: 0x222a, // (union)UNION
+  0x5c: 0x2229, // (intersection)INTERSECTION
+  0x5d: 0x228e, // MULTISET UNION
+  0x5e: 0x2227, // (logicaland)LOGICAL AND
+  0x5f: 0x2228, // (logicalor)LOGICAL OR
+  0x60: 0x22a2, // RIGHT TACK
+  0x61: 0x22a3, // LEFT TACK
+  0x62: 0x230a, // LEFT FLOOR
+  0x63: 0x230b, // RIGHT FLOOR
+  0x64: 0x2308, // LEFT CEILING
+  0x65: 0x2309, // RIGHT CEILING
+  0x66: 0x007b, // (braceleft)LEFT CURLY BRACKET
+  0x67: 0x007d, // (braceright)RIGHT CURLY BRACKET
+  0x68: 0x2329, // (angleleft)LEFT-POINTING ANGLE BRACKET
+  0x69: 0x232a, // (angleright)RIGHT-POINTING ANGLE BRACKET
+  0x6a: 0x2223, // DIVIDES
+  0x6b: 0x2225, // PARALLEL TO
+  0x6c: 0x2195, // (arrowupdn)UP DOWN ARROW
+  0x6d: 0x21d5, // UP DOWN DOUBLE ARROW
+  0x6e: 0x005c, // (backslash)REVERSE SOLIDUS
+  0x6f: 0x2240, // WREATH PRODUCT
+  0x70: 0x221a, // (radical)SQUARE ROOT
+  0x71: 0x2a3f, // AMALGAMATION OR COPRODUCT
+  0x72: 0x2207, // (gradient)NABLA
+  0x73: 0x222b, // (integral)INTEGRAL
+  0x74: 0x2294, // SQUARE CUP
+  0x75: 0x2293, // SQUARE CAP
+  0x76: 0x2291, // SQUARE IMAGE OF OR EQUAL TO
+  0x77: 0x2292, // SQUARE ORIGINAL OF OR EQUAL TO
+  0x78: 0x00a7, // (section)SECTION SIGN
+  0x79: 0x2020, // (dagger)DAGGER
+  0x7a: 0x2021, // (daggerdbl)DOUBLE DAGGER
+  0x7b: 0x00b6, // (paragraph)PILCROW SIGN
+  0x7c: 0x2663, // (club)BLACK CLUB SUIT
+  0x7d: 0x2662, // WHITE DIAMOND SUIT
+  0x7e: 0x2661, // WHITE HEART SUIT
+  0x7f: 0x2660, // (spade)BLACK SPADE SUIT
+};
