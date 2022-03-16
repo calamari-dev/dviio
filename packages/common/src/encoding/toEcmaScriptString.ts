@@ -7,25 +7,7 @@ export const toEcmaScriptString = (
   codePoint: number,
   encname: "OT1" | "OML" | "OMS" | "OMX"
 ): string | string[] | undefined => {
-  let c: number | number[] | undefined = undefined;
-
-  switch (encname) {
-    case "OT1":
-      c = ot1[codePoint];
-      break;
-
-    case "OML":
-      c = oml[codePoint];
-      break;
-
-    case "OMS":
-      c = oms[codePoint];
-      break;
-
-    case "OMX":
-      c = omx[codePoint];
-      break;
-  }
+  const c = { ot1, oml, oms, omx }[encname.toLowerCase()]?.[codePoint];
 
   switch (typeof c) {
     case "undefined":

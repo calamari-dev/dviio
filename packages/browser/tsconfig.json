@@ -1,5 +1,5 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": { "lib": ["ES2018", "DOM"] },
-  "references": [{ "path": "../common" }]
+  "references": [{ "path": ["../base", "../common"] }]
 }

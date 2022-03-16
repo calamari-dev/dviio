@@ -1,4 +1,4 @@
-import type { DviInstruction } from "../../../common/src";
+import type { DviInstruction } from "../../../base/src";
 
 export const parseDviInstruction = async (
   blob: Blob,

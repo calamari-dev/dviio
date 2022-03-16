@@ -1,4 +1,4 @@
-import { Parser } from "../../../common/src/types";
+import type { Parser } from "../../../base/src";
 import { getPostPostIndex } from "./getPostPostIndex";
 import { parseDviInstruction } from "./parseDviInstruction";
 

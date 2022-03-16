@@ -1,5 +1,5 @@
 import { parseHtmlTag } from "./parseHtmlTag";
-import { Plugin } from "../types";
+import { Plugin } from "../../../base/src";
 
 export const hyperTexPlugin: Plugin = ({ x }) => {
   if (x.slice(0, 5) !== "html:") {

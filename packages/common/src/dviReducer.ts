@@ -1,16 +1,15 @@
-import type { Element, Root } from "xast";
-import type { DviInstruction, Reducer } from "./types";
+import type { Root } from "xast";
+import type { DviInstruction, Reducer } from "../../base/src";
 import { toEcmaScriptString } from "./encoding";
-
-type Ext = {
-  current: Element;
-  textMode: boolean;
-};
+import type { CommonExt } from "./types";
 
 /**
  * 現在の State と DVI 命令から新たな State を計算する．
  */
-export const dviReducer: Reducer<Root, DviInstruction, Ext> = (inst, state) => {
+export const dviReducer: Reducer<Root, DviInstruction, CommonExt> = (
+  inst,
+  state
+) => {
   const { register, stack, fonts } = state;
 
   switch (inst.name) {
