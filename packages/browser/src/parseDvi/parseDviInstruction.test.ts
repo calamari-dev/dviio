@@ -1,44 +1,43 @@
-import { assert } from "chai";
 import { parseDviInstruction } from "./parseDviInstruction";
 
 let blob: Blob;
 
-before(async () => {
+beforeAll(async () => {
   const res = await fetch(`${location.origin}/assets/platex.dvi`);
   blob = await res.blob();
 });
 
 describe("parseDviInstruction", () => {
   it("SET_CHAR_#", async () => {
-    assert.deepEqual(await parseDviInstruction(blob, 0x128), {
+    expect(await parseDviInstruction(blob, 0x128)).toEqual({
       byteLength: 1,
       inst: { name: "SET", codePoint: 72 },
     });
   });
 
   it("SET", async () => {
-    assert.deepEqual(await parseDviInstruction(blob, 0x241), {
+    expect(await parseDviInstruction(blob, 0x241)).toEqual({
       byteLength: 3,
       inst: { name: "SET", codePoint: 9267 },
     });
   });
 
   it("SET_RULE", async () => {
-    assert.deepEqual(await parseDviInstruction(blob, 0x1a8), {
+    expect(await parseDviInstruction(blob, 0x1a8)).toEqual({
       byteLength: 9,
       inst: { name: "SET_RULE", height: 655360, width: 655360 },
     });
   });
 
   it("PUT_RULE", async () => {
-    assert.deepEqual(await parseDviInstruction(blob, 0x1b8), {
+    expect(await parseDviInstruction(blob, 0x1b8)).toEqual({
       byteLength: 9,
       inst: { name: "PUT_RULE", height: 26214, width: 11877477 },
     });
   });
 
   it("BOP", async () => {
-    assert.deepEqual(await parseDviInstruction(blob, 0x2a), {
+    expect(await parseDviInstruction(blob, 0x2a)).toEqual({
       byteLength: 45,
       inst: {
         name: "BOP",
@@ -49,56 +48,56 @@ describe("parseDviInstruction", () => {
   });
 
   it("EOP", async () => {
-    assert.deepEqual(await parseDviInstruction(blob, 0x26c), {
+    expect(await parseDviInstruction(blob, 0x26c)).toEqual({
       byteLength: 1,
       inst: { name: "EOP" },
     });
   });
 
   it("PUSH", async () => {
-    assert.deepEqual(await parseDviInstruction(blob, 0x57), {
+    expect(await parseDviInstruction(blob, 0x57)).toEqual({
       byteLength: 1,
       inst: { name: "PUSH" },
     });
   });
 
   it("POP", async () => {
-    assert.deepEqual(await parseDviInstruction(blob, 0x74), {
+    expect(await parseDviInstruction(blob, 0x74)).toEqual({
       byteLength: 1,
       inst: { name: "POP" },
     });
   });
 
   it("RIGHT", async () => {
-    assert.deepEqual(await parseDviInstruction(blob, 0x133), {
+    expect(await parseDviInstruction(blob, 0x133)).toEqual({
       byteLength: 4,
       inst: { name: "RIGHT", movement: -54614 },
     });
   });
 
   it("DOWN", async () => {
-    assert.deepEqual(await parseDviInstruction(blob, 0x187), {
+    expect(await parseDviInstruction(blob, 0x187)).toEqual({
       byteLength: 4,
       inst: { name: "DOWN", movement: -237825 },
     });
   });
 
   it("FNT", async () => {
-    assert.deepEqual(await parseDviInstruction(blob, 0x127), {
+    expect(await parseDviInstruction(blob, 0x127)).toEqual({
       byteLength: 1,
       inst: { name: "FNT", fontIndex: 18 },
     });
   });
 
   it("XXX", async () => {
-    assert.deepEqual(await parseDviInstruction(blob, 0xed), {
+    expect(await parseDviInstruction(blob, 0xed)).toEqual({
       byteLength: 37,
       inst: { name: "XXX", x: `html:<a href="http://example.org/">` },
     });
   });
 
   it("FNT_DEF", async () => {
-    assert.deepEqual(await parseDviInstruction(blob, 0x28a), {
+    expect(await parseDviInstruction(blob, 0x28a)).toEqual({
       byteLength: 20,
       inst: {
         name: "FNT_DEF",
@@ -113,7 +112,7 @@ describe("parseDviInstruction", () => {
   });
 
   it("PRE", async () => {
-    assert.deepEqual(await parseDviInstruction(blob, 0), {
+    expect(await parseDviInstruction(blob, 0)).toEqual({
       byteLength: 42,
       inst: {
         name: "PRE",
@@ -127,7 +126,7 @@ describe("parseDviInstruction", () => {
   });
 
   it("POST", async () => {
-    assert.deepEqual(await parseDviInstruction(blob, 0x26d), {
+    expect(await parseDviInstruction(blob, 0x26d)).toEqual({
       byteLength: 29,
       inst: {
         name: "POST",
@@ -144,7 +143,7 @@ describe("parseDviInstruction", () => {
   });
 
   it("POST_POST", async () => {
-    assert.deepEqual(await parseDviInstruction(blob, 0x2da), {
+    expect(await parseDviInstruction(blob, 0x2da)).toEqual({
       byteLength: 6,
       inst: { name: "POST_POST", version: 2, postIndex: 621 },
     });

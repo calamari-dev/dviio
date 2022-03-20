@@ -4,7 +4,7 @@
     "lib": ["ES2018"],
     "module": "ESNext",
     "moduleResolution": "node",
-    "types": ["mocha"],
+    "types": [],
     "importHelpers": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,

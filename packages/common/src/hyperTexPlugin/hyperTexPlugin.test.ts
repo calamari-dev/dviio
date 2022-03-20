@@ -1,37 +1,30 @@
-import { assert } from "chai";
 import { hyperTexPlugin } from "./hyperTexPlugin";
 
 describe("hyperTexPlugin", () => {
   it("hoge:<a name=foo>", () => {
-    assert.deepEqual(
-      hyperTexPlugin({ name: "XXX", x: "hoge:<a name=foo>" }),
-      null
-    );
+    expect(hyperTexPlugin({ name: "XXX", x: "hoge:<a name=foo>" })).toBe(null);
   });
 
   it("html:<unknown>", () => {
-    assert.deepEqual(
-      hyperTexPlugin({ name: "XXX", x: "html:<unknown>" }),
-      null
-    );
+    expect(hyperTexPlugin({ name: "XXX", x: "html:<unknown>" })).toBe(null);
   });
 
   it("html:<a name=foo>", () => {
-    assert.deepEqual(hyperTexPlugin({ name: "XXX", x: "html:<a name=foo>" }), {
+    expect(hyperTexPlugin({ name: "XXX", x: "html:<a name=foo>" })).toEqual({
       name: "$BEGIN_LINK_TARGET",
       htmlName: "foo",
     });
   });
 
   it("html:<a hrEf='x'>", () => {
-    assert.deepEqual(hyperTexPlugin({ name: "XXX", x: "html:<a hrEf='x'>" }), {
+    expect(hyperTexPlugin({ name: "XXX", x: "html:<a hrEf='x'>" })).toEqual({
       name: "$BEGIN_EXTERNAL_LINK",
       href: "x",
     });
   });
 
   it("html:</A>", () => {
-    assert.deepEqual(hyperTexPlugin({ name: "XXX", x: "html:</A>" }), {
+    expect(hyperTexPlugin({ name: "XXX", x: "html:</A>" })).toEqual({
       name: "$END_LINK",
     });
   });

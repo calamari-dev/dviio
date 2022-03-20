@@ -1,11 +1,10 @@
-import { assert } from "chai";
-import type { DviInstruction } from "../../../common/src";
+import type { DviInstruction } from "../../../base/src";
 import { hyperTexPlugin } from "../../../common/src";
 import { parseDvi } from "./parseDvi";
 
 let blob: Blob;
 
-before(async () => {
+beforeAll(async () => {
   const res = await fetch(`${location.origin}/assets/plain.dvi`);
   blob = await res.blob();
 });
@@ -18,7 +17,7 @@ describe("parseDvi", () => {
       list.push(inst.name);
     }
 
-    assert.deepEqual(list, [
+    expect(list).toEqual([
       "POST_POST",
       "POST",
       "FNT_DEF",
@@ -54,7 +53,7 @@ describe("parseDvi", () => {
       list.push(inst.name);
     }
 
-    assert.deepEqual(list, [
+    expect(list).toEqual([
       "POST_POST",
       "POST",
       "FNT_DEF",

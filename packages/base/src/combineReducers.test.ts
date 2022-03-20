@@ -1,4 +1,3 @@
-import { assert } from "chai";
 import type { Instruction, Reducer, State } from "./types";
 import { combineReducers } from "./combineReducers";
 import { initialState } from "./constants";
@@ -22,8 +21,7 @@ const b: Reducer<null, Instruction, string> = (_, state) => {
 };
 
 it("combineReducers", () => {
-  assert.deepEqual(
-    combineReducers({ x: a, y: b })({ name: "NOP" }, createState(0, "a")),
-    createState(1, "ab")
-  );
+  expect(
+    combineReducers({ x: a, y: b })({ name: "NOP" }, createState(0, "a"))
+  ).toEqual(createState(1, "ab"));
 });

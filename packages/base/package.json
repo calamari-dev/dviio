@@ -6,7 +6,7 @@
   "module": "dist/index.mjs",
   "types": "dist/src/index.d.ts",
   "scripts": {
-    "test": "cross-env TS_NODE_COMPILER_OPTIONS={\\\"module\\\":\\\"commonjs\\\"} mocha",
+    "test": "jest",
     "build": "npm-run-all build:*",
     "prebuild": "rimraf dist",
     "build:ts": "rollup --config rollup.config.js",
@@ -21,9 +21,5 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/calamari-dev/dviio.git"
-  },
-  "devDependencies": {
-    "cross-env": "^7.0.3",
-    "ts-node": "^10.7.0"
   }
 }

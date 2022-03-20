@@ -1,25 +1,24 @@
-import { assert } from "chai";
 import { parseHtmlTag } from "./parseHtmlTag";
 
 describe("parseHtmlTag", () => {
   it("<x-y>", () => {
-    assert.deepEqual(parseHtmlTag("<x-y>"), { type: "open", tagName: "x-y" });
+    expect(parseHtmlTag("<x-y>")).toEqual({ type: "open", tagName: "x-y" });
   });
 
   it("<x_y>", () => {
-    assert.deepEqual(parseHtmlTag("<x_y>"), { type: "invalid" });
+    expect(parseHtmlTag("<x_y>")).toEqual({ type: "invalid" });
   });
 
   it("<a>", () => {
-    assert.deepEqual(parseHtmlTag("<a>"), { type: "open", tagName: "a" });
+    expect(parseHtmlTag("<a>")).toEqual({ type: "open", tagName: "a" });
   });
 
   it("</a>", () => {
-    assert.deepEqual(parseHtmlTag("</a>"), { type: "close", tagName: "a" });
+    expect(parseHtmlTag("</a>")).toEqual({ type: "close", tagName: "a" });
   });
 
   it("<A\\thref>", () => {
-    assert.deepEqual(parseHtmlTag("<A\thref>"), {
+    expect(parseHtmlTag("<A\thref>")).toEqual({
       type: "open",
       tagName: "a",
       props: { href: "" },
@@ -27,7 +26,7 @@ describe("parseHtmlTag", () => {
   });
 
   it("<a data-xyz=true>", () => {
-    assert.deepEqual(parseHtmlTag("<a data-xyz=true>"), {
+    expect(parseHtmlTag("<a data-xyz=true>")).toEqual({
       type: "open",
       tagName: "a",
       props: { "data-xyz": "true" },
@@ -35,7 +34,7 @@ describe("parseHtmlTag", () => {
   });
 
   it("<a HREF='http://example.org'>", () => {
-    assert.deepEqual(parseHtmlTag("<a HREF='http://example.org'>"), {
+    expect(parseHtmlTag("<a HREF='http://example.org'>")).toEqual({
       type: "open",
       tagName: "a",
       props: { href: "http://example.org" },
@@ -43,7 +42,7 @@ describe("parseHtmlTag", () => {
   });
 
   it("<a  nAme=foo>", () => {
-    assert.deepEqual(parseHtmlTag("<a  nAme=foo>"), {
+    expect(parseHtmlTag("<a  nAme=foo>")).toEqual({
       type: "open",
       tagName: "a",
       props: { name: "foo" },
@@ -51,7 +50,7 @@ describe("parseHtmlTag", () => {
   });
 
   it('<a\\nHREF="http://example.org"\\tnAme=foo>', () => {
-    assert.deepEqual(parseHtmlTag('<a\nHREF="http://example.org"\tnAme=foo>'), {
+    expect(parseHtmlTag('<a\nHREF="http://example.org"\tnAme=foo>')).toEqual({
       type: "open",
       tagName: "a",
       props: { href: "http://example.org", name: "foo" },

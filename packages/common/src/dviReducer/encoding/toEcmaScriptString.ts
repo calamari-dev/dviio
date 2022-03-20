@@ -6,16 +6,20 @@ import { omx } from "./omx";
 export const toEcmaScriptString = (
   codePoint: number,
   encname: "OT1" | "OML" | "OMS" | "OMX"
-): string | string[] | undefined => {
-  const c = { ot1, oml, oms, omx }[encname.toLowerCase()]?.[codePoint];
+): string | undefined => {
+  const x = { ot1, oml, oms, omx }[encname.toLowerCase()]?.[codePoint];
 
-  switch (typeof c) {
+  switch (typeof x) {
     case "undefined":
       return undefined;
 
     case "number":
-      return String.fromCodePoint(c);
+      return fromCodePoint(x);
   }
 
-  return c.map((k) => String.fromCodePoint(k));
+  return x.map(fromCodePoint).join("");
+};
+
+const fromCodePoint = (x: number) => {
+  return String.fromCodePoint(x);
 };

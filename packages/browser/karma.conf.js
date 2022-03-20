@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 process.env.CHROME_BIN = require("puppeteer").executablePath();
-const typescript = require("rollup-plugin-typescript2");
+const typescript = require("rollup-plugin-ts");
 const resolve = require("@rollup/plugin-node-resolve").default;
 const commonjs = require("@rollup/plugin-commonjs");
 
 module.exports = function (config) {
   config.set({
-    frameworks: ["mocha"],
+    frameworks: ["jasmine"],
     files: [
       "src/**/*.test.ts",
       {

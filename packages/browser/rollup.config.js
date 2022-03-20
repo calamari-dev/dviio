@@ -20,7 +20,7 @@ export default [
       {
         file: "dist/iife.js",
         format: "iife",
-        name: "DVIREN",
+        name: "DVIIO_BROWSER",
         plugins: [terser({ format: { comments: () => false } })],
       },
     ],
