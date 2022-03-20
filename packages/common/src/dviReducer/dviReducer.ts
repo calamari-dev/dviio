@@ -11,54 +11,90 @@ export const dviReducer: Reducer<Root, DviInstruction, CommonExt> = (
   inst,
   state
 ) => {
-  const { register, stack, fonts, extension } = state;
-
   switch (inst.name) {
-    case "SET": {
+    case "SET":
+    case "PUT": {
+      const { register, fonts, extension } = state;
       const { codePoint } = inst;
       const font = fonts[register.f];
 
       if (!font) {
-        throw new Error("");
+        throw new Error(`Font ${register.f} is unknown.`);
       }
 
       const { encoding } = font;
-      const width = font.metrics[codePoint];
+      const width = font.advanceWidths[codePoint];
 
       if (!(encoding && isSupportedEncoding(encoding))) {
-        throw new Error("");
+        throw new Error(`The encoding of font ${register.f} is not supported.`);
       }
 
       if (width === undefined) {
-        throw new Error("");
+        throw new Error(
+          `The glyph (codepoint=${codePoint}) in font ${register.f} doesn't have advance width information.`
+        );
       }
 
-      const str = toEcmaScriptString(codePoint, encoding);
+      const text = toEcmaScriptString(codePoint, encoding);
 
-      if (str === undefined) {
-        throw new Error("");
+      if (text === undefined) {
+        throw new Error(
+          `${codePoint} is an invalid codepoint in ${encoding} encoding.`
+        );
       }
+
+      const unit = (state.numer / state.denom) * 1e-4;
 
       extension.current.children.push(
-        x("text", { x: register.h, y: register.v }, str)
+        x(
+          "text",
+          { x: `${register.h * unit}mm`, y: `${register.v * unit}mm` },
+          text
+        )
       );
 
-      register.h += width;
+      if (inst.name === "SET") {
+        register.h += width;
+      }
+
+      return state;
+    }
+
+    case "SET_RULE":
+    case "PUT_RULE": {
+      const { register, extension } = state;
+      const { width, height } = inst;
+      const unit = (state.numer / state.denom) * 1e-4;
+
+      extension.current.children.push(
+        x("rect", {
+          x: `${register.h * unit}mm`,
+          y: `${(register.v - height) * unit}mm`,
+          width: `${width * unit}mm`,
+          height: `${height * unit}mm`,
+        })
+      );
+
+      if (inst.name === "SET_RULE") {
+        register.h += width;
+      }
+
       return state;
     }
 
     case "PUSH": {
+      const { stack, register } = state;
       stack.push({ ...register });
       return state;
     }
 
     case "POP": {
-      stack.pop();
+      state.stack.pop();
       return state;
     }
 
     case "RIGHT": {
-      register.h += inst.movement;
+      state.register.h += inst.movement;
       return state;
     }
   }
@@ -66,6 +102,8 @@ export const dviReducer: Reducer<Root, DviInstruction, CommonExt> = (
   return state;
 };
 
+const supportedEncoding = ["OT1", "OML", "OMS", "OMX"];
+
 const isSupportedEncoding = (x: string): x is "OT1" | "OML" | "OMS" | "OMX" => {
-  return ["OT1", "OML", "OMS", "OMX"].includes(x);
+  return supportedEncoding.includes(x);
 };

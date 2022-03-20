@@ -61,7 +61,7 @@ export type State<Page, Ext = Empty> = {
       encoding?: string;
       scaleFactor: number;
       designSize: number;
-      metrics: { [U in number]?: number };
+      advanceWidths: { [U in number]?: number };
     };
   };
 };

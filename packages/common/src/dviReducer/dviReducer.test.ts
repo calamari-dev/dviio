@@ -15,19 +15,19 @@ const baseState = {
       encoding: "OT1",
       scaleFactor: 655360,
       designSize: 655360,
-      metrics: { 0x06: 655360 },
+      advanceWidths: { 0x06: 655360 },
     },
     {
       encoding: "OML",
       scaleFactor: 655360,
       designSize: 655360,
-      metrics: { 0x06: 655360 },
+      advanceWidths: { 0x06: 655360 },
     },
     {
       encoding: "OMS",
       scaleFactor: 655360,
       designSize: 655360,
-      metrics: { 0x06: 655360 },
+      advanceWidths: { 0x06: 655360 },
     },
   ],
   extension: {
