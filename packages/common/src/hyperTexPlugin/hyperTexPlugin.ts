@@ -22,12 +22,12 @@ export const hyperTexPlugin: Plugin = ({ x }) => {
 
       if ("href" in props) {
         const { href = "" } = props;
-        return { name: "$BEGIN_EXTERNAL_LINK", href };
+        return { name: "$BEGIN_LINK", href };
       }
 
       if ("name" in props) {
         const { name = "" } = props;
-        return { name: "$BEGIN_LINK_TARGET", htmlName: name };
+        return { name: "$BEGIN_REFERENCE", htmlName: name };
       }
 
       return null;

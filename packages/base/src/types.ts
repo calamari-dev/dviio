@@ -138,14 +138,10 @@ export type DviInstruction =
   | { name: "UNDEFINED"; opcode: number };
 
 export type SpecialInstruction =
-  | {
-      name: "$BEGIN_EXTERNAL_LINK";
-      href: string;
-    }
-  | {
-      name: "$BEGIN_LINK_TARGET";
-      htmlName: string;
-    }
-  | {
-      name: "$END_LINK";
-    };
+  | { name: "$BEGIN_LINK"; href: string }
+  | { name: "$BEGIN_REFERENCE"; htmlName: string }
+  | { name: "$END_LINK" }
+  | { name: "$COLOR"; color: string }
+  | { name: "$COLOR_PUSH"; color: string }
+  | { name: "$COLOR_POP" }
+  | { name: "$BACKGROUND_COLOR" };

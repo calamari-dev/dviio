@@ -1,0 +1,5 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": { "composite": true, "types": ["node", "jest"] },
+  "references": [{ "path": "../base" }, { "path": "../common" }]
+}

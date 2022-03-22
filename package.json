@@ -13,7 +13,8 @@
   "workspaces": [
     "packages\\common",
     "packages\\browser",
-    "packages\\base"
+    "packages\\base",
+    "packages\\node"
   ],
   "devDependencies": {
     "@babel/core": "^7.17.8",

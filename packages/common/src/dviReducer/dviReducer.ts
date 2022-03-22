@@ -44,7 +44,6 @@ export const dviReducer: Reducer<Root, DviInstruction, CommonExt> = (
       }
 
       const unit = (state.numer / state.denom) * 1e-4;
-
       extension.current.children.push(
         x(
           "text",

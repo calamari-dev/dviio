@@ -1,19 +1,22 @@
+import type { FileHandle } from "fs/promises";
 import type { DviInstruction } from "../../../base/src";
+import path from "path";
+import { open } from "fs/promises";
 import { hyperTexPlugin } from "../../../common/src";
 import { parseDvi } from "./parseDvi";
 
-let blob: Blob;
+let handle: FileHandle;
 
 beforeAll(async () => {
-  const res = await fetch(`${location.origin}/assets/plain.dvi`);
-  blob = await res.blob();
+  const dviPath = path.resolve(__dirname, "../__tests__/assets/plain.dvi");
+  handle = await open(dviPath, "r");
 });
 
 describe("parseDvi", () => {
   it("without plugin", async () => {
     const list: DviInstruction["name"][] = [];
 
-    for await (const inst of parseDvi(blob, [], 1)) {
+    for await (const inst of parseDvi(handle, [], 1)) {
       list.push(inst.name);
     }
 
@@ -49,7 +52,7 @@ describe("parseDvi", () => {
   it("with hyperTexPlugin", async () => {
     const list: DviInstruction["name"][] = [];
 
-    for await (const inst of parseDvi(blob, [hyperTexPlugin], 1)) {
+    for await (const inst of parseDvi(handle, [hyperTexPlugin], 1)) {
       list.push(inst.name);
     }
 

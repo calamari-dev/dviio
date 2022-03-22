@@ -1,11 +1,25 @@
-import { Loader, DviInstruction, LoaderState } from "../../common/src";
+import type { Loader, DviInstruction, LoaderState } from "../../base/src";
 
-export class FontLoader extends Loader {
+export class FontLoader implements Loader {
+  constructor(private fn: (dir: string, name: string) => string | null) {}
+
   async reduce(inst: DviInstruction, state: LoaderState) {
-    return 0 as unknown as LoaderState;
+    if (inst.name !== "FNT_DEF") {
+      return state;
+    }
+
+    const path = this.fn(inst.directory, inst.filename);
+
+    if (path === null) {
+      throw new Error("");
+    }
+
+    fetch(path);
+
+    return state;
   }
 
   end() {
-    return 0;
+    return;
   }
 }
