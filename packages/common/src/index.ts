@@ -1,4 +1,5 @@
 import "tslib";
-export type { CommonExt } from "./types";
-export { dviReducer } from "./dviReducer/dviReducer";
+export type { SvgExt, YamlExt } from "./types";
+export { dviSvgReducer } from "./dviSvgReducer";
+export { dviYamlReducer } from "./dviYamlReducer";
 export { hyperTexPlugin } from "./hyperTexPlugin";

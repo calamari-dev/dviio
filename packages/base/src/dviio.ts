@@ -9,7 +9,7 @@ export const dviio = <Input, Draft, Output, Inst extends Instruction, Ext>(
 ) => {
   return async (input: Input, page: number): Promise<Output> => {
     const parser = preset.parser(input, page, combinePlugins(plugins));
-    const loader = useLoadersInSeries(preset.loaders);
+    const loader = useLoadersInSeries(preset.loaders || []);
     let state = createState(preset.initializer());
 
     for await (const inst of parser) {
@@ -18,6 +18,7 @@ export const dviio = <Input, Draft, Output, Inst extends Instruction, Ext>(
     }
 
     await loader.end();
+
     return preset.builder(state.draft);
   };
 };

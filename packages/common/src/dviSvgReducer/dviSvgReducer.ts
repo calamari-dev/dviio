@@ -1,13 +1,10 @@
 import type { Root } from "xast";
 import type { DviInstruction, Reducer } from "@dviio/base";
-import type { CommonExt } from "../types";
+import type { SvgExt } from "../types";
 import { x } from "xastscript";
 import { toEcmaScriptString } from "./encoding";
 
-/**
- * 現在の State と DVI 命令から新たな State を計算する．
- */
-export const dviReducer: Reducer<Root, DviInstruction, CommonExt> = (
+export const dviSvgReducer: Reducer<Root, DviInstruction, SvgExt> = (
   inst,
   state
 ) => {

@@ -1,13 +1,13 @@
 export type Preset<
   Input,
   Draft,
-  Output,
+  Output = Draft,
   Inst extends Instruction = DviInstruction,
-  Ext = never
+  Ext = unknown
 > = {
   initializer: () => { extension: Ext; draft: Draft };
   parser: Parser<Input, Inst>;
-  loaders: (new () => Loader<Inst, Ext>)[];
+  loaders?: (new () => Loader<Inst, Ext>)[];
   reducer: Reducer<Draft, Inst, Ext>;
   builder: Builder<Draft, Output>;
 };
@@ -24,7 +24,7 @@ export type Parser<Input, Inst extends Instruction = DviInstruction> = (
 
 export abstract class Loader<
   Inst extends Instruction = DviInstruction,
-  Ext = never
+  Ext = unknown
 > {
   abstract reduce(
     inst: DviInstruction | Inst,
@@ -36,7 +36,7 @@ export abstract class Loader<
 export type Reducer<
   Draft,
   Inst extends Instruction = DviInstruction,
-  Ext = never
+  Ext = unknown
 > = (
   inst: DviInstruction | Inst,
   state: State<Draft, Ext>

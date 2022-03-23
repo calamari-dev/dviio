@@ -2,7 +2,7 @@ import type { Instruction, DviInstruction, Loader, LoaderState } from "./types";
 
 export const useLoadersInSeries = <
   Inst extends Instruction = DviInstruction,
-  Ext = never
+  Ext = unknown
 >(
   loaders: (new () => Loader<Inst, Ext>)[]
 ): Loader<Inst, Ext> => {

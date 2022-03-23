@@ -2,7 +2,7 @@ import { produce, setAutoFreeze } from "immer";
 import { x } from "xastscript";
 import { toString } from "xast-util-to-string";
 import { createState } from "@dviio/base";
-import { dviReducer } from "./dviReducer";
+import { dviSvgReducer } from "./dviSvgReducer";
 
 setAutoFreeze(false);
 
@@ -45,7 +45,7 @@ describe("dviReducer", () => {
       draft.extension.current = draft.draft;
     });
 
-    const { draft } = dviReducer({ name: "SET", codePoint: 0x06 }, state);
+    const { draft } = dviSvgReducer({ name: "SET", codePoint: 0x06 }, state);
     expect(toString(draft)).toBe("Σ");
   });
 
@@ -56,7 +56,7 @@ describe("dviReducer", () => {
       draft.extension.current = draft.draft;
     });
 
-    const { draft } = dviReducer({ name: "SET", codePoint: 0x06 }, state);
+    const { draft } = dviSvgReducer({ name: "SET", codePoint: 0x06 }, state);
     expect(toString(draft)).toBe("𝛴");
   });
 
@@ -67,7 +67,7 @@ describe("dviReducer", () => {
       draft.extension.current = draft.draft;
     });
 
-    const { draft } = dviReducer({ name: "SET", codePoint: 0x06 }, state);
+    const { draft } = dviSvgReducer({ name: "SET", codePoint: 0x06 }, state);
     expect(toString(draft)).toBe("±");
   });
 });
