@@ -1,5 +1,5 @@
-import type { DviInstruction } from "../../../base/src";
-import { hyperTexPlugin } from "../../../common/src";
+import type { DviInstruction } from "@dviio/base";
+import { hyperTexPlugin } from "@dviio/common";
 import { parseDvi } from "./parseDvi";
 
 let blob: Blob;
@@ -13,7 +13,7 @@ describe("parseDvi", () => {
   it("without plugin", async () => {
     const list: DviInstruction["name"][] = [];
 
-    for await (const inst of parseDvi(blob, [], 1)) {
+    for await (const inst of parseDvi(blob, 1)) {
       list.push(inst.name);
     }
 
@@ -43,13 +43,14 @@ describe("parseDvi", () => {
       "RIGHT",
       "SET",
       "POP",
+      "EOP",
     ]);
   });
 
   it("with hyperTexPlugin", async () => {
     const list: DviInstruction["name"][] = [];
 
-    for await (const inst of parseDvi(blob, [hyperTexPlugin], 1)) {
+    for await (const inst of parseDvi(blob, 1, hyperTexPlugin)) {
       list.push(inst.name);
     }
 
@@ -79,6 +80,7 @@ describe("parseDvi", () => {
       "RIGHT",
       "SET",
       "POP",
+      "EOP",
     ]);
   });
 });

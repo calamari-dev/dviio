@@ -1,26 +1,34 @@
 import type { FileHandle } from "fs/promises";
-import type { Parser } from "../../../base/src";
+import type { Parser } from "@dviio/base";
 import { getPostPostIndex } from "./getPostPostIndex";
 import { parseDviInstruction } from "./parseDviInstruction";
 
 export const parseDvi: Parser<FileHandle> = async function* (
   handle,
-  plugins,
-  page
+  page,
+  plugin
 ) {
   const fontSet = new Set<number>();
-  let index = await getPostPostIndex(handle);
   let hasPostPostVisited = false;
   let bopIndex = 0;
   let totalPages = 0;
   let currentPage = 0;
 
-  main: while (1) {
-    const { byteLength, inst } = await parseDviInstruction(handle, index);
+  const buffer = Buffer.alloc(4096);
+  let index = await getPostPostIndex(handle);
+
+  while (1) {
+    const { byteLength, inst } = await parseDviInstruction(
+      handle,
+      index,
+      buffer
+    );
 
     switch (inst.name) {
-      case "EOP":
-        return inst;
+      case "EOP": {
+        yield { name: "EOP" };
+        return;
+      }
 
       case "BOP": {
         if (currentPage !== page) {
@@ -35,17 +43,8 @@ export const parseDvi: Parser<FileHandle> = async function* (
       }
 
       case "XXX": {
-        for (const plugin of plugins) {
-          const special = plugin(inst);
-
-          if (special !== null) {
-            yield special;
-            index += byteLength;
-            continue main;
-          }
-        }
-
-        yield inst;
+        const special = plugin && plugin(inst);
+        yield special ? special : inst;
         index += byteLength;
         continue;
       }
@@ -89,6 +88,4 @@ export const parseDvi: Parser<FileHandle> = async function* (
       }
     }
   }
-
-  return { name: "EOP" };
 };

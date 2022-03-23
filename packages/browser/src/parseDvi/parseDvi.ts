@@ -1,8 +1,8 @@
-import type { Parser } from "../../../base/src";
+import type { Parser } from "@dviio/base";
 import { getPostPostIndex } from "./getPostPostIndex";
 import { parseDviInstruction } from "./parseDviInstruction";
 
-export const parseDvi: Parser<Blob> = async function* (blob, plugins, page) {
+export const parseDvi: Parser<Blob> = async function* (blob, page, plugin) {
   const fontSet = new Set<number>();
   let index = await getPostPostIndex(blob);
   let hasPostPostVisited = false;
@@ -10,12 +10,14 @@ export const parseDvi: Parser<Blob> = async function* (blob, plugins, page) {
   let totalPages = 0;
   let currentPage = 0;
 
-  main: while (1) {
+  while (1) {
     const { byteLength, inst } = await parseDviInstruction(blob, index);
 
     switch (inst.name) {
-      case "EOP":
-        return inst;
+      case "EOP": {
+        yield { name: "EOP" };
+        return;
+      }
 
       case "BOP": {
         if (currentPage !== page) {
@@ -30,17 +32,8 @@ export const parseDvi: Parser<Blob> = async function* (blob, plugins, page) {
       }
 
       case "XXX": {
-        for (const plugin of plugins) {
-          const special = plugin(inst);
-
-          if (special !== null) {
-            yield special;
-            index += byteLength;
-            continue main;
-          }
-        }
-
-        yield inst;
+        const special = plugin && plugin(inst);
+        yield special ? special : inst;
         index += byteLength;
         continue;
       }
@@ -84,6 +77,4 @@ export const parseDvi: Parser<Blob> = async function* (blob, plugins, page) {
       }
     }
   }
-
-  return { name: "EOP" };
 };

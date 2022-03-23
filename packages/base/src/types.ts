@@ -1,17 +1,15 @@
-type Empty = { [T in string | number | symbol]: never };
-
-export type Mode<
+export type Preset<
   Input,
-  Page,
+  Draft,
   Output,
   Inst extends Instruction = DviInstruction,
-  Ext = Empty
+  Ext = never
 > = {
-  initializer: () => { extension: Ext; page: Page };
+  initializer: () => { extension: Ext; draft: Draft };
   parser: Parser<Input, Inst>;
-  loader: { new (): Loader<Inst, Ext> };
-  reducer: Reducer<Page, Inst, Ext>;
-  builder: Builder<Page, Output>;
+  loaders: (new () => Loader<Inst, Ext>)[];
+  reducer: Reducer<Draft, Inst, Ext>;
+  builder: Builder<Draft, Output>;
 };
 
 export type Plugin = (
@@ -20,41 +18,44 @@ export type Plugin = (
 
 export type Parser<Input, Inst extends Instruction = DviInstruction> = (
   input: Input,
-  plugins: Plugin[],
-  page: number
-) => AsyncGenerator<DviInstruction | Inst, DviInstruction | Inst>;
+  page: number,
+  plugin?: Plugin
+) => AsyncGenerator<DviInstruction | Inst, void>;
 
 export abstract class Loader<
   Inst extends Instruction = DviInstruction,
-  Ext = Empty
+  Ext = never
 > {
   abstract reduce(
     inst: DviInstruction | Inst,
     state: LoaderState<Ext>
   ): Promise<LoaderState<Ext>>;
-  abstract end(): void;
+  abstract end(): Promise<void>;
 }
 
 export type Reducer<
-  Page,
+  Draft,
   Inst extends Instruction = DviInstruction,
-  Ext = Empty
-> = (inst: DviInstruction | Inst, state: State<Page, Ext>) => State<Page, Ext>;
+  Ext = never
+> = (
+  inst: DviInstruction | Inst,
+  state: State<Draft, Ext>
+) => State<Draft, Ext>;
 
-export type Builder<Page, Output> = (page: Page) => Output;
+export type Builder<Draft, Output> = (Draft: Draft) => Output;
 
-export type LoaderState<Ext = Empty> = Pick<
+export type LoaderState<Ext = never> = Pick<
   State<unknown, Ext>,
   "fonts" | "extension"
 >;
 
-export type State<Page, Ext = Empty> = {
+export type State<Draft, Ext = never> = {
   register: { [T in "h" | "v" | "w" | "x" | "y" | "z" | "f"]: number };
   stack: Omit<State<unknown>["register"], "f">[];
   numer: number;
   denom: number;
   mag: number;
-  page: Page;
+  draft: Draft;
   extension: Ext;
   fonts: {
     [T in number]?: {

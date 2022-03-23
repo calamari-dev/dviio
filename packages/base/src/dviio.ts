@@ -1,26 +1,23 @@
-import type { Instruction, Mode, Plugin, State } from "./types";
-import { initialState } from "./constants";
+import type { Instruction, Preset, Plugin } from "./types";
+import { createState } from "./createState";
+import { combinePlugins } from "./combinePlugins";
+import { useLoadersInSeries } from "./useLoadersInSeries";
 
-type Config<Input, Page, Output, Inst extends Instruction, Ext> = {
-  mode: Mode<Input, Page, Output, Inst, Ext>;
-  page: number;
-  plugin?: Plugin[];
-};
+export const dviio = <Input, Draft, Output, Inst extends Instruction, Ext>(
+  preset: Preset<Input, Draft, Output, Inst, Ext>,
+  plugins: Plugin[] = []
+) => {
+  return async (input: Input, page: number): Promise<Output> => {
+    const parser = preset.parser(input, page, combinePlugins(plugins));
+    const loader = useLoadersInSeries(preset.loaders);
+    let state = createState(preset.initializer());
 
-export const dviio = async <Input, Page, Output, Inst extends Instruction, Ext>(
-  input: Input,
-  { mode, page, plugin = [] }: Config<Input, Page, Output, Inst, Ext>
-): Promise<Output> => {
-  const parser = mode.parser(input, plugin, page);
-  const loader = new mode.loader();
-  let state: State<Page, Ext> = { ...initialState, ...mode.initializer() };
+    for await (const inst of parser) {
+      Object.assign(state, await loader.reduce(inst, state));
+      state = preset.reducer(inst, state);
+    }
 
-  const loaders = [new mode.loader()];
-
-  for await (const inst of parser) {
-    Object.assign(state, await loader.reduce(inst, state));
-    state = mode.reducer(inst, state);
-  }
-
-  return mode.builder(state.page);
+    await loader.end();
+    return preset.builder(state.draft);
+  };
 };

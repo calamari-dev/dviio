@@ -11,36 +11,38 @@ beforeAll(async () => {
 });
 
 describe("parseDviInstruction", () => {
+  const buffer = Buffer.alloc(1024);
+
   it("SET_CHAR_#", async () => {
-    expect(await parseDviInstruction(handle, 0x128)).toEqual({
+    expect(await parseDviInstruction(handle, 0x128, buffer)).toEqual({
       byteLength: 1,
       inst: { name: "SET", codePoint: 72 },
     });
   });
 
   it("SET", async () => {
-    expect(await parseDviInstruction(handle, 0x241)).toEqual({
+    expect(await parseDviInstruction(handle, 0x241, buffer)).toEqual({
       byteLength: 3,
       inst: { name: "SET", codePoint: 9267 },
     });
   });
 
   it("SET_RULE", async () => {
-    expect(await parseDviInstruction(handle, 0x1a8)).toEqual({
+    expect(await parseDviInstruction(handle, 0x1a8, buffer)).toEqual({
       byteLength: 9,
       inst: { name: "SET_RULE", height: 655360, width: 655360 },
     });
   });
 
   it("PUT_RULE", async () => {
-    expect(await parseDviInstruction(handle, 0x1b8)).toEqual({
+    expect(await parseDviInstruction(handle, 0x1b8, buffer)).toEqual({
       byteLength: 9,
       inst: { name: "PUT_RULE", height: 26214, width: 11877477 },
     });
   });
 
   it("BOP", async () => {
-    expect(await parseDviInstruction(handle, 0x2a)).toEqual({
+    expect(await parseDviInstruction(handle, 0x2a, buffer)).toEqual({
       byteLength: 45,
       inst: {
         name: "BOP",
@@ -51,56 +53,56 @@ describe("parseDviInstruction", () => {
   });
 
   it("EOP", async () => {
-    expect(await parseDviInstruction(handle, 0x26c)).toEqual({
+    expect(await parseDviInstruction(handle, 0x26c, buffer)).toEqual({
       byteLength: 1,
       inst: { name: "EOP" },
     });
   });
 
   it("PUSH", async () => {
-    expect(await parseDviInstruction(handle, 0x57)).toEqual({
+    expect(await parseDviInstruction(handle, 0x57, buffer)).toEqual({
       byteLength: 1,
       inst: { name: "PUSH" },
     });
   });
 
   it("POP", async () => {
-    expect(await parseDviInstruction(handle, 0x74)).toEqual({
+    expect(await parseDviInstruction(handle, 0x74, buffer)).toEqual({
       byteLength: 1,
       inst: { name: "POP" },
     });
   });
 
   it("RIGHT", async () => {
-    expect(await parseDviInstruction(handle, 0x133)).toEqual({
+    expect(await parseDviInstruction(handle, 0x133, buffer)).toEqual({
       byteLength: 4,
       inst: { name: "RIGHT", movement: -54614 },
     });
   });
 
   it("DOWN", async () => {
-    expect(await parseDviInstruction(handle, 0x187)).toEqual({
+    expect(await parseDviInstruction(handle, 0x187, buffer)).toEqual({
       byteLength: 4,
       inst: { name: "DOWN", movement: -237825 },
     });
   });
 
   it("FNT", async () => {
-    expect(await parseDviInstruction(handle, 0x127)).toEqual({
+    expect(await parseDviInstruction(handle, 0x127, buffer)).toEqual({
       byteLength: 1,
       inst: { name: "FNT", fontIndex: 18 },
     });
   });
 
   it("XXX", async () => {
-    expect(await parseDviInstruction(handle, 0xed)).toEqual({
+    expect(await parseDviInstruction(handle, 0xed, buffer)).toEqual({
       byteLength: 37,
       inst: { name: "XXX", x: `html:<a href="http://example.org/">` },
     });
   });
 
   it("FNT_DEF", async () => {
-    expect(await parseDviInstruction(handle, 0x28a)).toEqual({
+    expect(await parseDviInstruction(handle, 0x28a, buffer)).toEqual({
       byteLength: 20,
       inst: {
         name: "FNT_DEF",
@@ -115,7 +117,7 @@ describe("parseDviInstruction", () => {
   });
 
   it("PRE", async () => {
-    expect(await parseDviInstruction(handle, 0)).toEqual({
+    expect(await parseDviInstruction(handle, 0, buffer)).toEqual({
       byteLength: 42,
       inst: {
         name: "PRE",
@@ -129,7 +131,7 @@ describe("parseDviInstruction", () => {
   });
 
   it("POST", async () => {
-    expect(await parseDviInstruction(handle, 0x26d)).toEqual({
+    expect(await parseDviInstruction(handle, 0x26d, buffer)).toEqual({
       byteLength: 29,
       inst: {
         name: "POST",
@@ -146,7 +148,7 @@ describe("parseDviInstruction", () => {
   });
 
   it("POST_POST", async () => {
-    expect(await parseDviInstruction(handle, 0x2da)).toEqual({
+    expect(await parseDviInstruction(handle, 0x2da, buffer)).toEqual({
       byteLength: 6,
       inst: { name: "POST_POST", version: 2, postIndex: 621 },
     });

@@ -1,25 +1,12 @@
-import type { Loader, DviInstruction, LoaderState } from "../../base/src";
+import type { Loader, DviInstruction, LoaderState } from "@dviio/base";
+import type { CommonExt } from "@dviio/common";
 
-export class FontLoader implements Loader {
-  constructor(private fn: (dir: string, name: string) => string | null) {}
-
-  async reduce(inst: DviInstruction, state: LoaderState) {
-    if (inst.name !== "FNT_DEF") {
-      return state;
-    }
-
-    const path = this.fn(inst.directory, inst.filename);
-
-    if (path === null) {
-      throw new Error("");
-    }
-
-    fetch(path);
-
+export class FontLoader implements Loader<DviInstruction, CommonExt> {
+  async reduce(inst: DviInstruction, state: LoaderState<CommonExt>) {
     return state;
   }
 
-  end() {
+  async end() {
     return;
   }
 }

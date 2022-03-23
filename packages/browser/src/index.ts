@@ -1,20 +1,20 @@
 import type { Root } from "xast";
 import { x } from "xastscript";
 import { toXml } from "xast-util-to-xml";
-import type { DviInstruction, Mode } from "../../base/src";
-import { CommonExt, dviReducer } from "../../common/src";
+import { DviInstruction, Preset } from "@dviio/base";
+import { CommonExt, dviReducer } from "@dviio/common";
 import { parseDvi } from "./parseDvi";
 import { FontLoader } from "./FontLoader";
 
-export { dviio } from "../../base/src";
+export { dviio } from "@dviio/base";
 
-export const tex82: Mode<Blob, Root, string, DviInstruction, CommonExt> = {
+export const tex82: Preset<Blob, Root, string, DviInstruction, CommonExt> = {
   initializer: () => {
-    const page = x();
-    return { page, extension: { current: page, textMode: false } };
+    const draft = x();
+    return { draft, extension: { current: draft, textMode: false } };
   },
   parser: parseDvi,
-  loader: FontLoader,
+  loaders: [FontLoader],
   reducer: dviReducer,
   builder: toXml,
 };

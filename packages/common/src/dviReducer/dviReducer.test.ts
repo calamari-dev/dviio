@@ -1,15 +1,20 @@
 import { produce, setAutoFreeze } from "immer";
 import { x } from "xastscript";
 import { toString } from "xast-util-to-string";
-import { initialState } from "../../../base/src";
+import { createState } from "@dviio/base";
 import { dviReducer } from "./dviReducer";
 
 setAutoFreeze(false);
 
-const page = x();
+const draft = x();
 const baseState = {
-  ...initialState,
-  page,
+  ...createState({
+    draft,
+    extension: {
+      current: draft,
+      textMode: false,
+    },
+  }),
   fonts: [
     {
       encoding: "OT1",
@@ -30,43 +35,39 @@ const baseState = {
       advanceWidths: { 0x06: 655360 },
     },
   ],
-  extension: {
-    current: page,
-    textMode: false,
-  },
 } as const;
 
 describe("dviReducer", () => {
   it("SET (OT1 encoding)", () => {
     const state = produce(baseState, (draft) => {
       draft.register.f = 0;
-      draft.page = x();
-      draft.extension.current = draft.page;
+      draft.draft = x();
+      draft.extension.current = draft.draft;
     });
 
-    const { page } = dviReducer({ name: "SET", codePoint: 0x06 }, state);
-    expect(toString(page)).toBe("Σ");
+    const { draft } = dviReducer({ name: "SET", codePoint: 0x06 }, state);
+    expect(toString(draft)).toBe("Σ");
   });
 
   it("SET (OML encoding)", () => {
     const state = produce(baseState, (draft) => {
       draft.register.f = 1;
-      draft.page = x();
-      draft.extension.current = draft.page;
+      draft.draft = x();
+      draft.extension.current = draft.draft;
     });
 
-    const { page } = dviReducer({ name: "SET", codePoint: 0x06 }, state);
-    expect(toString(page)).toBe("𝛴");
+    const { draft } = dviReducer({ name: "SET", codePoint: 0x06 }, state);
+    expect(toString(draft)).toBe("𝛴");
   });
 
   it("SET (OMS encoding)", () => {
     const state = produce(baseState, (draft) => {
       draft.register.f = 2;
-      draft.page = x();
-      draft.extension.current = draft.page;
+      draft.draft = x();
+      draft.extension.current = draft.draft;
     });
 
-    const { page } = dviReducer({ name: "SET", codePoint: 0x06 }, state);
-    expect(toString(page)).toBe("±");
+    const { draft } = dviReducer({ name: "SET", codePoint: 0x06 }, state);
+    expect(toString(draft)).toBe("±");
   });
 });

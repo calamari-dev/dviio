@@ -1,11 +1,10 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
 import ts from "rollup-plugin-ts";
 import resolve from "@rollup/plugin-node-resolve";
 import { terser } from "rollup-plugin-terser";
 
 export default [
   {
-    external: require("./package.json").dependencies,
+    external: module.require("./package.json").dependencies,
     input: "src/index.ts",
     plugins: [ts(), resolve()],
     output: [

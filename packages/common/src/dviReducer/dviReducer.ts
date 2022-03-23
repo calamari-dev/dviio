@@ -1,5 +1,5 @@
 import type { Root } from "xast";
-import type { DviInstruction, Reducer } from "../../../base/src";
+import type { DviInstruction, Reducer } from "@dviio/base";
 import type { CommonExt } from "../types";
 import { x } from "xastscript";
 import { toEcmaScriptString } from "./encoding";

@@ -1,12 +1,12 @@
 import type { FileHandle } from "fs/promises";
-import type { DviInstruction } from "../../../base/src";
+import type { DviInstruction } from "@dviio/base";
 import { Buffer } from "buffer";
 
 export const parseDviInstruction = async (
   handle: FileHandle,
-  index: number
+  index: number,
+  buffer: Buffer
 ): Promise<{ byteLength: number; inst: DviInstruction }> => {
-  const buffer = Buffer.alloc(1024);
   await handle.read({ buffer, length: 1, position: index });
   const opcode = buffer.readUint8(0);
 
@@ -206,13 +206,7 @@ export const parseDviInstruction = async (
     const k = readUint(buffer, i);
 
     if (k > buffer.byteLength) {
-      const buffer = Buffer.alloc(k);
-      await handle.read({ buffer, length: k, position: index + i + 1 });
-
-      return {
-        byteLength: i + k + 1,
-        inst: { name: "XXX", x: buffer.toString("utf8") },
-      };
+      throw new Error("Given buffer's size is not large enough.");
     }
 
     await handle.read({ buffer, length: k, position: index + i + 1 });
@@ -238,14 +232,7 @@ export const parseDviInstruction = async (
     } as const;
 
     if (a + l > buffer.byteLength) {
-      const buffer = Buffer.alloc(a + l);
-      await handle.read({ buffer, length: a + l, position: index + i + 15 });
-      const path = buffer.toString("utf8");
-
-      return {
-        byteLength: i + 15 + a + l,
-        inst: { ...part, directory: path.slice(0, a), filename: path.slice(a) },
-      };
+      throw new Error("Given buffer's size is not large enough.");
     }
 
     await handle.read({ buffer, length: a + l, position: index + i + 15 });
@@ -270,14 +257,7 @@ export const parseDviInstruction = async (
     } as const;
 
     if (k > buffer.byteLength) {
-      const buffer = Buffer.alloc(k);
-      await handle.read({ buffer, length: k, position: index + 15 });
-      const comment = buffer.toString("utf8");
-
-      return {
-        byteLength: k + 15,
-        inst: { ...part, comment },
-      };
+      throw new Error("Given buffer's size is not large enough.");
     }
 
     await handle.read({ buffer, length: k, position: index + 15 });

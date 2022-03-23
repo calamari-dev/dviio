@@ -1,18 +1,16 @@
 {
-  "name": "dviio-common",
+  "name": "@dviio/common",
   "version": "0.1.0",
   "description": "",
   "main": "dist/index.cjs",
   "module": "dist/index.mjs",
-  "types": "dist/src/index.d.ts",
+  "types": "dist/index.d.ts",
   "scripts": {
     "test": "jest",
-    "build": "npm-run-all build:*",
-    "prebuild": "rimraf dist",
-    "build:ts": "rollup --config rollup.config.js",
-    "build:dts": "tsc --project tsconfig.dts.json"
+    "build": "rollup --config rollup.config.js",
+    "prebuild": "rimraf dist"
   },
-  "author": "",
+  "author": "calamari-dev",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/calamari-dev/dviio/issues"

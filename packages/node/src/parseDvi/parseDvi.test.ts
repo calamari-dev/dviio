@@ -1,8 +1,8 @@
 import type { FileHandle } from "fs/promises";
-import type { DviInstruction } from "../../../base/src";
+import type { DviInstruction } from "@dviio/base";
 import path from "path";
 import { open } from "fs/promises";
-import { hyperTexPlugin } from "../../../common/src";
+import { hyperTexPlugin } from "@dviio/common";
 import { parseDvi } from "./parseDvi";
 
 let handle: FileHandle;
@@ -16,7 +16,7 @@ describe("parseDvi", () => {
   it("without plugin", async () => {
     const list: DviInstruction["name"][] = [];
 
-    for await (const inst of parseDvi(handle, [], 1)) {
+    for await (const inst of parseDvi(handle, 1)) {
       list.push(inst.name);
     }
 
@@ -46,13 +46,14 @@ describe("parseDvi", () => {
       "RIGHT",
       "SET",
       "POP",
+      "EOP",
     ]);
   });
 
   it("with hyperTexPlugin", async () => {
     const list: DviInstruction["name"][] = [];
 
-    for await (const inst of parseDvi(handle, [hyperTexPlugin], 1)) {
+    for await (const inst of parseDvi(handle, 1, hyperTexPlugin)) {
       list.push(inst.name);
     }
 
@@ -82,6 +83,7 @@ describe("parseDvi", () => {
       "RIGHT",
       "SET",
       "POP",
+      "EOP",
     ]);
   });
 });

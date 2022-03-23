@@ -8,13 +8,13 @@
     "test": "npm run test --workspaces",
     "build": "npm run build --workspaces"
   },
-  "author": "",
+  "author": "calamari-dev",
   "license": "MIT",
   "workspaces": [
-    "packages\\common",
-    "packages\\browser",
     "packages\\base",
-    "packages\\node"
+    "packages\\common",
+    "packages\\node",
+    "packages\\browser"
   ],
   "devDependencies": {
     "@babel/core": "^7.17.8",
@@ -34,7 +34,6 @@
     "karma-jasmine": "^4.0.1",
     "karma-rollup-preprocessor": "^7.0.8",
     "karma-spec-reporter": "^0.0.33",
-    "npm-run-all": "^4.1.5",
     "prettier": "^2.5.1",
     "puppeteer": "^13.4.1",
     "rimraf": "^3.0.2",
