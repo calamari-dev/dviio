@@ -1,8 +1,12 @@
-import type { Root } from "xast";
+import type { Element, Root } from "xast";
 import type { DviInstruction, Reducer } from "@dviio/base";
-import type { SvgExt } from "../types";
 import { x } from "xastscript";
 import { toEcmaScriptString } from "./encoding";
+
+export type SvgExt = {
+  current: Root | Element;
+  textMode: boolean;
+};
 
 export const dviSvgReducer: Reducer<Root, DviInstruction, SvgExt> = (
   inst,

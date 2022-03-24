@@ -8,6 +8,10 @@ export const dviio = <Input, Draft, Output, Inst extends Instruction, Ext>(
   plugins: Plugin[] = []
 ) => {
   return async (input: Input, page: number): Promise<Output> => {
+    if (page < 1 || !Number.isInteger(page)) {
+      throw new Error("Given page is invalid.");
+    }
+
     const parser = preset.parser(input, page, combinePlugins(plugins));
     const loader = useLoadersInSeries(preset.loaders || []);
     let state = createState(preset.initializer());

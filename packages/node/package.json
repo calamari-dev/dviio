@@ -23,6 +23,7 @@
   "dependencies": {
     "@types/node": "^17.0.21",
     "@types/xast": "^1.0.2",
+    "js-yaml": "^4.1.0",
     "xast-util-to-string": "^2.0.0",
     "xast-util-to-xml": "^3.0.0",
     "xastscript": "^3.0.0"

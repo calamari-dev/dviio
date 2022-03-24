@@ -21,7 +21,9 @@
     "url": "git+https://github.com/calamari-dev/dviio.git"
   },
   "dependencies": {
+    "@types/js-yaml": "^4.0.5",
     "@types/xast": "^1.0.2",
+    "js-yaml": "^4.1.0",
     "xastscript": "^3.0.0"
   },
   "devDependencies": {
