@@ -1,6 +1,6 @@
 # dviio
 
-ES2018 以降をサポートする任意の環境で動作する DVI 操作ユーティリティ
+ES2018 以降をサポートする任意の環境で動作する DVI 操作ユーティリティ（現在製作中）
 
 ## Features
 
@@ -15,3 +15,15 @@ ES2018 以降をサポートする任意の環境で動作する DVI 操作ユ�
 ## Installing
 
 ## Example
+
+```typescript
+import { dviio } from "@dviio/base";
+import { yaml } from "@dviio/node";
+
+const toYaml = dviio(yaml);
+
+(async () => {
+  const handle = await open(dviPath, "r");
+  console.log(await toYaml(handle, 1));
+})();
+```

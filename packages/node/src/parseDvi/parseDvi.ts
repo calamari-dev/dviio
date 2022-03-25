@@ -85,7 +85,11 @@ export const parseDvi: Parser<FileHandle> = async function* (
         throw new Error("This input is illegal.");
       }
 
-      p === page[page.length - 1] && bopIndices.push(index);
+      if (p === page[page.length - 1]) {
+        bopIndices.push(index);
+        page.pop();
+      }
+
       index = inst.bopIndex;
     }
   }
