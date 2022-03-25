@@ -3,12 +3,14 @@ import type { DviInstruction, Reducer } from "@dviio/base";
 import { x } from "xastscript";
 import { toEcmaScriptString } from "./encoding";
 
+export type SvgDraft = Root;
+
 export type SvgExt = {
   current: Root | Element;
   textMode: boolean;
 };
 
-export const dviSvgReducer: Reducer<Root, DviInstruction, SvgExt> = (
+export const dviSvgReducer: Reducer<SvgDraft, DviInstruction, SvgExt> = (
   inst,
   state
 ) => {

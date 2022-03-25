@@ -8,14 +8,13 @@ export const normalizePages = (
       return { start: 1, end: Infinity };
 
     case "number":
-      return isValidPage(pages) ? [pages] : null;
+      return isNatural(pages) ? [pages] : null;
   }
 
   if (!Array.isArray(pages)) {
     let { start = 1, end = Infinity } = pages;
-    start = Math.ceil(start);
+    start = Math.max(Math.ceil(start), 1);
     end = Math.floor(end);
-    start < 1 && (start = 1);
 
     if (start > end || start === Infinity || end === -Infinity) {
       return null;
@@ -32,7 +31,7 @@ export const normalizePages = (
   set.delete(undefined as unknown as number);
   const result = [...set].sort(compare) as [number, ...number[]];
 
-  if (!result.every(isValidPage)) {
+  if (!result.every(isNatural)) {
     return null;
   }
 
@@ -41,5 +40,5 @@ export const normalizePages = (
     : result;
 };
 
-const isValidPage = (page: number) => page > 0 && Number.isSafeInteger(page);
+const isNatural = (page: number) => page > 0 && Number.isSafeInteger(page);
 const compare = (x: number, y: number) => x - y;

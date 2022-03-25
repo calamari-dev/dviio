@@ -15,27 +15,19 @@ export const hyperTexPlugin: Plugin = ({ x }) => {
   switch (result.tagName) {
     case "a": {
       if (result.type === "close") {
-        return { name: "$END_LINK" };
+        return { name: "$END_ANCHOR" };
       }
 
       const { props = {} } = result;
 
       if ("href" in props) {
         const { href = "" } = props;
-        return { name: "$BEGIN_LINK", href };
+        return { name: "$BEGIN_ANCHOR_HREF", href };
       }
 
       if ("name" in props) {
         const { name = "" } = props;
-        return { name: "$BEGIN_REFERENCE", htmlName: name };
-      }
-
-      return null;
-    }
-
-    case "img": {
-      if (result.type === "close") {
-        return null;
+        return { name: "$BEGIN_ANCHOR_NAME", htmlName: name };
       }
 
       return null;
@@ -46,11 +38,12 @@ export const hyperTexPlugin: Plugin = ({ x }) => {
         return null;
       }
 
-      return null;
+      const { href = "" } = result.props || {};
+      return { name: "$SET_BASE_URL", href };
     }
   }
 };
 
-const isKnownTagName = (x: string): x is "a" | "img" | "base" => {
-  return x === "a" || x === "img" || x === "base";
+const isKnownTagName = (x: string): x is "a" | "base" => {
+  return x === "a" || x === "base";
 };

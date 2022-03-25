@@ -1,18 +1,18 @@
 import type { FileHandle } from "fs/promises";
 import type { Root } from "xast";
-import { createState, DviInstruction, Preset } from "@dviio/base";
 import { x } from "xastscript";
-import { toXml } from "xast-util-to-xml";
-import { dump } from "js-yaml";
+import { createState, DviInstruction, Preset } from "@dviio/base";
 import {
   SvgExt,
   YamlExt,
   dviSvgReducer,
   dviYamlReducer,
   YamlDraft,
+  buildSvg,
+  buildYaml,
 } from "@dviio/common";
 import { parseDvi } from "./parseDvi";
-import { TfmLoader } from "./TfmLoader/TfmLoader";
+import { TfmLoader } from "./TfmLoader";
 
 export const tex82: Preset<FileHandle, Root, string, DviInstruction, SvgExt> = {
   initializer: () => {
@@ -22,7 +22,7 @@ export const tex82: Preset<FileHandle, Root, string, DviInstruction, SvgExt> = {
   parser: parseDvi,
   loaders: [TfmLoader],
   reducer: dviSvgReducer,
-  builder: toXml,
+  builder: buildSvg,
 };
 
 export const yaml: Preset<
@@ -47,5 +47,5 @@ export const yaml: Preset<
   },
   parser: parseDvi,
   reducer: dviYamlReducer,
-  builder: (x) => (console.log(x), dump(x)),
+  builder: buildYaml,
 };

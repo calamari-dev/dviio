@@ -1,8 +1,7 @@
 import type { Root } from "xast";
 import { x } from "xastscript";
-import { toXml } from "xast-util-to-xml";
 import { DviInstruction, Preset } from "@dviio/base";
-import { SvgExt, dviSvgReducer } from "@dviio/common";
+import { SvgExt, dviSvgReducer, buildSvg } from "@dviio/common";
 import { parseDvi } from "./parseDvi";
 import { FontLoader } from "./FontLoader";
 
@@ -16,5 +15,5 @@ export const tex82: Preset<Blob, Root, string, DviInstruction, SvgExt> = {
   parser: parseDvi,
   loaders: [FontLoader],
   reducer: dviSvgReducer,
-  builder: toXml,
+  builder: buildSvg,
 };
