@@ -18,7 +18,7 @@ export type Plugin = (
 
 export type Parser<Input, Inst extends Instruction = DviInstruction> = (
   input: Input,
-  page: number,
+  page: [number, ...number[]] | { start: number; end: number },
   plugin?: Plugin
 ) => AsyncGenerator<DviInstruction | Inst, void>;
 

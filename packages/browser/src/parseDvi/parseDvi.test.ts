@@ -13,11 +13,12 @@ describe("parseDvi", () => {
   it("without plugin", async () => {
     const list: DviInstruction["name"][] = [];
 
-    for await (const inst of parseDvi(blob, 1)) {
+    for await (const inst of parseDvi(blob, [1])) {
       list.push(inst.name);
     }
 
     expect(list).toEqual([
+      "PRE",
       "POST_POST",
       "POST",
       "FNT_DEF",
@@ -32,6 +33,7 @@ describe("parseDvi", () => {
       "DOWN",
       "PUSH",
       "RIGHT",
+      "FNT_DEF",
       "FNT",
       "SET",
       "XXX",
@@ -50,11 +52,12 @@ describe("parseDvi", () => {
   it("with hyperTexPlugin", async () => {
     const list: DviInstruction["name"][] = [];
 
-    for await (const inst of parseDvi(blob, 1, hyperTexPlugin)) {
+    for await (const inst of parseDvi(blob, [1], hyperTexPlugin)) {
       list.push(inst.name);
     }
 
     expect(list).toEqual([
+      "PRE",
       "POST_POST",
       "POST",
       "FNT_DEF",
@@ -69,6 +72,7 @@ describe("parseDvi", () => {
       "DOWN",
       "PUSH",
       "RIGHT",
+      "FNT_DEF",
       "FNT",
       "SET",
       "$END_LINK",

@@ -322,7 +322,7 @@ const readInt = (buffer: Buffer, byteLength: number): number => {
     return k < 0x800000 ? k : k - 0x1000000;
   }
 
-  return -1;
+  return NaN;
 };
 
 const readUint = (buffer: Buffer, byteLength: number): number => {
@@ -341,5 +341,5 @@ const readUint = (buffer: Buffer, byteLength: number): number => {
     return k;
   }
 
-  return -1;
+  return NaN;
 };

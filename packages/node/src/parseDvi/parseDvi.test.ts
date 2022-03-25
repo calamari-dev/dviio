@@ -1,26 +1,22 @@
-import type { FileHandle } from "fs/promises";
 import type { DviInstruction } from "@dviio/base";
 import path from "path";
 import { open } from "fs/promises";
 import { hyperTexPlugin } from "@dviio/common";
 import { parseDvi } from "./parseDvi";
 
-let handle: FileHandle;
-
-beforeAll(async () => {
-  const dviPath = path.resolve(__dirname, "../__tests__/assets/plain.dvi");
-  handle = await open(dviPath, "r");
-});
+const dviPath = path.resolve(__dirname, "../__tests__/assets/plain.dvi");
 
 describe("parseDvi", () => {
   it("without plugin", async () => {
+    const handle = await open(dviPath, "r");
     const list: DviInstruction["name"][] = [];
 
-    for await (const inst of parseDvi(handle, 1)) {
+    for await (const inst of parseDvi(handle, [1])) {
       list.push(inst.name);
     }
 
     expect(list).toEqual([
+      "PRE",
       "POST_POST",
       "POST",
       "FNT_DEF",
@@ -35,6 +31,7 @@ describe("parseDvi", () => {
       "DOWN",
       "PUSH",
       "RIGHT",
+      "FNT_DEF",
       "FNT",
       "SET",
       "XXX",
@@ -51,13 +48,15 @@ describe("parseDvi", () => {
   });
 
   it("with hyperTexPlugin", async () => {
+    const handle = await open(dviPath, "r");
     const list: DviInstruction["name"][] = [];
 
-    for await (const inst of parseDvi(handle, 1, hyperTexPlugin)) {
+    for await (const inst of parseDvi(handle, [1], hyperTexPlugin)) {
       list.push(inst.name);
     }
 
     expect(list).toEqual([
+      "PRE",
       "POST_POST",
       "POST",
       "FNT_DEF",
@@ -72,6 +71,7 @@ describe("parseDvi", () => {
       "DOWN",
       "PUSH",
       "RIGHT",
+      "FNT_DEF",
       "FNT",
       "SET",
       "$END_LINK",
