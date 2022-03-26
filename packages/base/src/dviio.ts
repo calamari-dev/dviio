@@ -1,15 +1,18 @@
-import type { Instruction, Preset, Plugin } from "./types";
+import type { Preset, Plugin, DviInstruction } from "./types";
 import { createState } from "./createState";
 import { combinePlugins } from "./combinePlugins";
-import { useLoadersInSeries } from "./useLoadersInSeries";
+import { combineLoaders } from "./combineLoaders";
 import { normalizePages } from "./normalizePages";
 
 type PageSpec = "*" | number | number[] | { start?: number; end?: number };
 
-export const dviio = <Input, Draft, Output, Inst extends Instruction, Ext>(
-  preset: Preset<Input, Draft, Output, Inst, Ext>,
+export const dviio = <Input, Draft, Output, Ext, Inst extends DviInstruction>(
+  preset: Preset<Input, Draft, Output, Ext, Inst>,
   plugins: Plugin[] = []
 ) => {
+  const Loader = combineLoaders(...(preset.loaders || []));
+  const plugin = combinePlugins(...plugins);
+
   return async (input: Input, pages: PageSpec = "*"): Promise<Output> => {
     const normalized = normalizePages(pages);
 
@@ -17,8 +20,8 @@ export const dviio = <Input, Draft, Output, Inst extends Instruction, Ext>(
       throw new Error("Given page is invalid.");
     }
 
-    const parser = preset.parser(input, normalized, combinePlugins(plugins));
-    const loader = useLoadersInSeries(preset.loaders || []);
+    const parser = preset.parser(input, normalized, plugin);
+    const loader = new Loader();
     let state = createState(preset.initializer());
 
     for await (const inst of parser) {
@@ -26,8 +29,7 @@ export const dviio = <Input, Draft, Output, Inst extends Instruction, Ext>(
       state = preset.reducer(inst, state);
     }
 
-    await loader.end();
-
+    await loader.end?.();
     return preset.builder(state.draft);
   };
 };

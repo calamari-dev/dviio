@@ -2,13 +2,13 @@ export type Preset<
   Input,
   Draft,
   Output = Draft,
-  Inst extends Instruction = DviInstruction,
-  Ext = unknown
+  Ext = unknown,
+  Inst extends DviInstruction = DviInstruction
 > = {
   initializer: () => { extension: Ext; draft: Draft };
   parser: Parser<Input, Inst>;
-  loaders?: (new () => Loader<Inst, Ext>)[];
-  reducer: Reducer<Draft, Inst, Ext>;
+  loaders?: { new (): Loader<Ext, Inst> }[];
+  reducer: Reducer<Draft, Ext, Inst>;
   builder: Builder<Draft, Output>;
 };
 
@@ -16,33 +16,31 @@ export type Plugin = (
   inst: DviInstruction & { name: "XXX" }
 ) => SpecialInstruction | null;
 
-export type Parser<Input, Inst extends Instruction = DviInstruction> = (
+export type Parser<Input, Inst extends DviInstruction = DviInstruction> = (
   input: Input,
   page: [number, ...number[]] | { start: number; end: number },
   plugin?: Plugin
-) => AsyncGenerator<DviInstruction | Inst, void>;
+) => AsyncGenerator<Inst, void>;
 
 export abstract class Loader<
-  Inst extends Instruction = DviInstruction,
-  Ext = unknown
+  Ext = unknown,
+  Inst extends DviInstruction = DviInstruction
 > {
-  abstract reduce(
-    inst: DviInstruction | Inst,
-    state: LoaderState<Ext>
-  ): Promise<LoaderState<Ext>>;
-  abstract end(): Promise<void>;
+  abstract reduce<T extends Inst, U extends LoaderState<Ext>>(
+    inst: T,
+    state: U
+  ): Promise<U>;
+
+  abstract end?(): Promise<unknown>;
 }
 
 export type Reducer<
   Draft,
-  Inst extends Instruction = DviInstruction,
-  Ext = unknown
-> = (
-  inst: DviInstruction | Inst,
-  state: State<Draft, Ext>
-) => State<Draft, Ext>;
+  Ext = unknown,
+  Inst extends DviInstruction = DviInstruction
+> = (inst: Inst, state: State<Draft, Ext>) => State<Draft, Ext>;
 
-export type Builder<Draft, Output> = (Draft: Draft) => Output;
+export type Builder<Draft, Output> = (draft: Draft) => Output;
 
 export type LoaderState<Ext = never> = Pick<
   State<unknown, Ext>,
@@ -66,8 +64,6 @@ export type State<Draft, Ext = never> = {
     };
   };
 };
-
-export type Instruction = { name: string };
 
 export type DviInstruction =
   | SpecialInstruction

@@ -1,12 +1,8 @@
-import type { Loader, DviInstruction, LoaderState } from "@dviio/base";
+import type { Loader } from "@dviio/base";
 import type { SvgExt } from "@dviio/common";
 
-export class FontLoader implements Loader<DviInstruction, SvgExt> {
-  async reduce(inst: DviInstruction, state: LoaderState<SvgExt>) {
+export class FontLoader implements Loader<SvgExt> {
+  reduce: Loader<SvgExt>["reduce"] = async (_, state) => {
     return state;
-  }
-
-  async end() {
-    return;
-  }
+  };
 }

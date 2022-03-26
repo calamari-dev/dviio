@@ -11,21 +11,21 @@ describe("hyperTexPlugin", () => {
 
   it("html:<a name=foo>", () => {
     expect(hyperTexPlugin({ name: "XXX", x: "html:<a name=foo>" })).toEqual({
-      name: "$BEGIN_REFERENCE",
+      name: "$BEGIN_ANCHOR_NAME",
       htmlName: "foo",
     });
   });
 
   it("html:<a hrEf='x'>", () => {
     expect(hyperTexPlugin({ name: "XXX", x: "html:<a hrEf='x'>" })).toEqual({
-      name: "$BEGIN_LINK",
+      name: "$BEGIN_ANCHOR_HREF",
       href: "x",
     });
   });
 
   it("html:</A>", () => {
     expect(hyperTexPlugin({ name: "XXX", x: "html:</A>" })).toEqual({
-      name: "$END_LINK",
+      name: "$END_ANCHOR",
     });
   });
 });

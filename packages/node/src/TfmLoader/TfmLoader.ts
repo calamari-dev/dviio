@@ -1,10 +1,10 @@
+import type { Loader } from "@dviio/base";
 import { promisify } from "util";
 import { execFile } from "child_process";
 import path from "path";
-import { DviInstruction, Loader, LoaderState } from "@dviio/base";
 
-export class TfmLoader implements Loader<DviInstruction> {
-  async reduce(inst: DviInstruction, state: LoaderState) {
+export class TfmLoader implements Loader {
+  reduce: Loader["reduce"] = async (inst, state) => {
     if (inst.name !== "FNT_DEF") {
       return state;
     }
@@ -21,11 +21,7 @@ export class TfmLoader implements Loader<DviInstruction> {
     }
 
     return state;
-  }
-
-  async end() {
-    return;
-  }
+  };
 }
 
 const execute = promisify(execFile);

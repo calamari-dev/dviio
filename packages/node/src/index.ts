@@ -1,7 +1,7 @@
 import type { FileHandle } from "fs/promises";
 import type { Root } from "xast";
 import { x } from "xastscript";
-import { createState, DviInstruction, Preset } from "@dviio/base";
+import { createState, Preset } from "@dviio/base";
 import {
   SvgExt,
   YamlExt,
@@ -14,7 +14,7 @@ import {
 import { parseDvi } from "./parseDvi";
 import { TfmLoader } from "./TfmLoader";
 
-export const tex82: Preset<FileHandle, Root, string, DviInstruction, SvgExt> = {
+export const tex82: Preset<FileHandle, Root, string, SvgExt> = {
   initializer: () => {
     const draft = x();
     return { draft, extension: { current: draft, textMode: false } };
@@ -25,13 +25,7 @@ export const tex82: Preset<FileHandle, Root, string, DviInstruction, SvgExt> = {
   builder: buildSvg,
 };
 
-export const yaml: Preset<
-  FileHandle,
-  YamlDraft,
-  string,
-  DviInstruction,
-  YamlExt
-> = {
+export const yaml: Preset<FileHandle, YamlDraft, string, YamlExt> = {
   initializer: () => {
     const document: YamlDraft["document"] = [];
     const { numer, denom, mag } = createState({ draft: 0, extension: 0 });

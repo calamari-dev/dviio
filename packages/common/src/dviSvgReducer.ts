@@ -1,5 +1,5 @@
 import type { Element, Root } from "xast";
-import type { DviInstruction, Reducer } from "@dviio/base";
+import type { Reducer } from "@dviio/base";
 import { x } from "xastscript";
 import { toEcmaScriptString } from "./encoding";
 
@@ -10,10 +10,7 @@ export type SvgExt = {
   textMode: boolean;
 };
 
-export const dviSvgReducer: Reducer<SvgDraft, DviInstruction, SvgExt> = (
-  inst,
-  state
-) => {
+export const dviSvgReducer: Reducer<SvgDraft, SvgExt> = (inst, state) => {
   switch (inst.name) {
     case "SET":
     case "PUT": {

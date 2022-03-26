@@ -17,10 +17,7 @@ export type YamlExt = {
   parents: [Element[], ...Element[][]];
 };
 
-export const dviYamlReducer: Reducer<YamlDraft, DviInstruction, YamlExt> = (
-  inst,
-  state
-) => {
+export const dviYamlReducer: Reducer<YamlDraft, YamlExt> = (inst, state) => {
   switch (inst.name) {
     case "PRE": {
       const { preamble } = state.draft;
