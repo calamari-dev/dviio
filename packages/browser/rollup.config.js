@@ -1,13 +1,13 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
 import ts from "rollup-plugin-ts";
 import resolve from "@rollup/plugin-node-resolve";
 import { terser } from "rollup-plugin-terser";
+const pkg = module.require("./package.json");
 
 export default [
   {
-    external: require("./package.json").dependencies,
+    external: Object.keys(pkg.dependencies || {}),
     input: "src/index.ts",
-    plugins: [ts(), resolve()],
+    plugins: [resolve(), ts()],
     output: [
       { file: "dist/index.cjs", format: "cjs" },
       { file: "dist/index.mjs", format: "es" },
@@ -15,13 +15,13 @@ export default [
   },
   {
     input: "src/index.ts",
-    plugins: [ts(), resolve()],
+    plugins: [resolve(), ts()],
     output: [
       {
         file: "dist/iife.js",
         format: "iife",
         name: "DVIIO_BROWSER",
-        plugins: [terser({ format: { comments: () => false } })],
+        plugins: [terser()],
       },
     ],
   },

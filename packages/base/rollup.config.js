@@ -1,26 +1,29 @@
-import ts from "rollup-plugin-ts";
 import resolve from "@rollup/plugin-node-resolve";
+import commonjs from "@rollup/plugin-commonjs";
+import ts from "rollup-plugin-ts";
 import { terser } from "rollup-plugin-terser";
 
 export default [
   {
-    external: module.require("./package.json").dependencies,
+    external: ["core-js-pure/actual/structured-clone"],
     input: "src/index.ts",
-    plugins: [ts(), resolve()],
-    output: [
-      { file: "dist/index.cjs", format: "cjs" },
-      { file: "dist/index.mjs", format: "es" },
-    ],
+    plugins: [commonjs(), resolve(), ts()],
+    output: [{ file: "dist/index.cjs", format: "cjs" }],
   },
   {
     input: "src/index.ts",
-    plugins: [ts(), resolve()],
+    plugins: [commonjs(), resolve(), ts()],
+    output: [{ file: "dist/index.mjs", format: "es" }],
+  },
+  {
+    input: "src/index.ts",
+    plugins: [commonjs(), resolve(), ts()],
     output: [
       {
         file: "dist/iife.js",
         format: "iife",
         name: "DVIIO_BASE",
-        plugins: [terser({ format: { comments: () => false } })],
+        plugins: [terser()],
       },
     ],
   },

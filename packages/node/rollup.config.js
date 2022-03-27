@@ -3,9 +3,9 @@ import resolve from "@rollup/plugin-node-resolve";
 const pkg = module.require("./package.json");
 
 export default {
-  external: pkg.dependencies,
+  external: Object.keys(pkg.dependencies || {}),
   input: "src/index.ts",
-  plugins: [ts(), resolve()],
+  plugins: [resolve(), ts()],
   output: [
     { file: pkg.main, format: "cjs" },
     { file: pkg.module, format: "es" },

@@ -21,6 +21,8 @@
   },
   "homepage": "https://github.com/calamari-dev/dviio#readme",
   "dependencies": {
+    "@dviio/base": "^0.1.0",
+    "@dviio/common": "^0.1.0",
     "@types/node": "^17.0.21",
     "@types/xast": "^1.0.2",
     "xast-util-to-string": "^2.0.0",

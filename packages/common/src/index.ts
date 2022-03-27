@@ -1,7 +1,5 @@
 import type { SvgDraft } from "./dviSvgReducer";
 import type { YamlDraft } from "./dviYamlReducer";
-
-import "tslib";
 import { toXml } from "xast-util-to-xml";
 import { dump } from "js-yaml";
 

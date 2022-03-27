@@ -1,4 +1,4 @@
-type PageSpec = "*" | number | number[] | { start?: number; end?: number };
+import type { PageSpec } from "./types";
 
 export const normalizePages = (
   pages: PageSpec
@@ -29,16 +29,20 @@ export const normalizePages = (
 
   const set = new Set(pages);
   set.delete(undefined as unknown as number);
-  const result = [...set].sort(compare) as [number, ...number[]];
+  const result = [...set].filter(isNatural).sort(subtract);
 
-  if (!result.every(isNatural)) {
-    return null;
+  switch (result.length) {
+    case 0:
+      return null;
+
+    case 1:
+      return [result[0]];
   }
 
   return result.length - 1 === result[result.length - 1] - result[0]
     ? { start: result[0], end: result[result.length - 1] }
-    : result;
+    : (result as [number, ...number[]]);
 };
 
 const isNatural = (page: number) => page > 0 && Number.isSafeInteger(page);
-const compare = (x: number, y: number) => x - y;
+const subtract = (x: number, y: number) => x - y;

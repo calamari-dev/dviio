@@ -5,7 +5,7 @@ export type Preset<
   Ext = unknown,
   Inst extends DviInstruction = DviInstruction
 > = {
-  initializer: () => { extension: Ext; draft: Draft };
+  initializer: Initializer<Draft, Ext>;
   parser: Parser<Input, Inst>;
   loaders?: { new (): Loader<Ext, Inst> }[];
   reducer: Reducer<Draft, Ext, Inst>;
@@ -15,6 +15,16 @@ export type Preset<
 export type Plugin = (
   inst: DviInstruction & { name: "XXX" }
 ) => SpecialInstruction | null;
+
+export type PageSpec =
+  | "*"
+  | number
+  | number[]
+  | { start?: number; end?: number };
+
+export type Initializer<Draft, Ext = unknown> =
+  | { draft: Draft; extension: Ext }
+  | (() => { draft: Draft; extension: Ext });
 
 export type Parser<Input, Inst extends DviInstruction = DviInstruction> = (
   input: Input,
@@ -30,7 +40,6 @@ export abstract class Loader<
     inst: T,
     state: U
   ): Promise<U>;
-
   abstract end?(): Promise<unknown>;
 }
 
@@ -38,7 +47,7 @@ export type Reducer<
   Draft,
   Ext = unknown,
   Inst extends DviInstruction = DviInstruction
-> = (inst: Inst, state: State<Draft, Ext>) => State<Draft, Ext>;
+> = <T extends Inst, U extends State<Draft, Ext>>(inst: T, state: U) => U;
 
 export type Builder<Draft, Output> = (draft: Draft) => Output;
 
@@ -142,4 +151,4 @@ export type SpecialInstruction =
   | { name: "$COLOR"; color: string }
   | { name: "$COLOR_PUSH"; color: string }
   | { name: "$COLOR_POP" }
-  | { name: "$BACKGROUND_COLOR" };
+  | { name: "$BACKGROUND_COLOR"; color: string };

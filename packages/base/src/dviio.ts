@@ -1,10 +1,8 @@
-import type { Preset, Plugin, DviInstruction } from "./types";
+import type { Preset, Plugin, DviInstruction, PageSpec } from "./types";
 import { createState } from "./createState";
 import { combinePlugins } from "./combinePlugins";
 import { combineLoaders } from "./combineLoaders";
 import { normalizePages } from "./normalizePages";
-
-type PageSpec = "*" | number | number[] | { start?: number; end?: number };
 
 export const dviio = <Input, Draft, Output, Ext, Inst extends DviInstruction>(
   preset: Preset<Input, Draft, Output, Ext, Inst>,
@@ -22,7 +20,7 @@ export const dviio = <Input, Draft, Output, Ext, Inst extends DviInstruction>(
 
     const parser = preset.parser(input, normalized, plugin);
     const loader = new Loader();
-    let state = createState(preset.initializer());
+    let state = createState(preset.initializer);
 
     for await (const inst of parser) {
       Object.assign(state, await loader.reduce(inst, state));

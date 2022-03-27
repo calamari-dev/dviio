@@ -27,7 +27,8 @@ export const combineLoaders = <Ext, Inst extends DviInstruction>(
       return state;
     };
 
-    end = () => Promise.all(loadersMap.get(this)?.map((x) => x?.end?.()) || []);
+    end = () =>
+      Promise.all((loadersMap.get(this) || []).map((loader) => loader.end?.()));
   };
 };
 

@@ -1,6 +1,6 @@
 import { normalizePages } from "./normalizePages";
 
-it("normalizePageRange", () => {
+it("normalizePages", () => {
   expect(normalizePages(1)).toEqual([1]);
   expect(normalizePages(0)).toBe(null);
   expect(normalizePages(NaN)).toEqual(null);
@@ -21,7 +21,7 @@ it("normalizePageRange", () => {
   expect(normalizePages([5, 3, 5, 1])).toEqual([1, 3, 5]);
   expect(normalizePages([5, 3, 4, 5, 2])).toEqual({ start: 2, end: 5 });
   expect(normalizePages([0.1])).toBe(null);
-  expect(normalizePages([5, 3, NaN])).toEqual(null);
-  expect(normalizePages([1, -Infinity, 9])).toEqual(null);
-  expect(normalizePages([-1, 0, 1])).toBe(null);
+  expect(normalizePages([5, 3, NaN])).toEqual([3, 5]);
+  expect(normalizePages([1, -Infinity, 9])).toEqual([1, 9]);
+  expect(normalizePages([-1, 0, 1])).toEqual([1]);
 });

@@ -1,7 +1,7 @@
 import path from "path";
 import { open } from "fs/promises";
 import { dviio } from "@dviio/base";
-import { yaml } from "../index";
+import { yaml } from "../yaml";
 
 const dviPath = path.resolve(__dirname, "assets/plain.dvi");
 
