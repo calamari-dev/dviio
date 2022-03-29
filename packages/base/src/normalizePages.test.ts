@@ -24,4 +24,8 @@ it("normalizePages", () => {
   expect(normalizePages([5, 3, NaN])).toEqual([3, 5]);
   expect(normalizePages([1, -Infinity, 9])).toEqual([1, 9]);
   expect(normalizePages([-1, 0, 1])).toEqual([1]);
+
+  expect(normalizePages(new Set(x))).toEqual([1, 3, 5]);
+  expect(normalizePages(new Set([4, 1, 1]))).toEqual([1, 4]);
+  expect(normalizePages(new Set([5, 3, NaN]))).toEqual([3, 5]);
 });

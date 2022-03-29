@@ -11,15 +11,13 @@ export const parseHtmlTag = (x: string): HtmlTag => {
   if (x[1] === "/") {
     const tagName = x.slice(2, -1).toLowerCase();
 
-    if (/[^a-zA-Z-]/.test(tagName)) {
-      return { type: "invalid" };
-    }
-
-    return { type: "close", tagName };
+    return /[^a-zA-Z-]/.test(tagName)
+      ? { type: "invalid" }
+      : { type: "close", tagName };
   }
 
-  x = x.slice(1, x.length - 1);
-  const tagName = (/^[a-zA-Z-]+/.exec(x) || [""])[0].toLowerCase();
+  x = x.slice(1, -1);
+  const tagName = /^[a-zA-Z-]+/.exec(x)?.[0].toLowerCase() || "";
 
   if (tagName === "") {
     return { type: "invalid" };
@@ -33,26 +31,27 @@ export const parseHtmlTag = (x: string): HtmlTag => {
   }
 
   while (x !== "") {
-    const match = x.match(/^(?:[a-zA-Z-]+(?:="[^"]*"|='[^']*'|=[^"'=<>`]+)?)/);
+    const match = /^(?:[a-zA-Z-]+(?:="[^"]*"|='[^']*'|=[^"'=<>`]+)?)/.exec(x);
 
     if (!match) {
       return { type: "invalid" };
     }
 
-    const attr = match[0];
-    const eqIdx = attr.indexOf("=");
-    x = x.slice(attr.length).trim();
+    const attribute = match[0];
+    const eqIndex = attribute.indexOf("=");
+    x = x.slice(attribute.length).trim();
 
-    if (eqIdx === -1) {
-      props[attr.toLowerCase()] = "";
+    if (eqIndex === -1) {
+      props[attribute.toLowerCase()] = "";
       continue;
     }
 
-    const key = attr.slice(0, eqIdx).toLowerCase();
-    props[key] = /["']/.test(attr[attr.length - 1])
-      ? attr.slice(eqIdx + 2, attr.length - 1)
-      : attr.slice(eqIdx + 1);
+    const key = attribute.slice(0, eqIndex).toLowerCase();
+    props[key] =
+      attribute.endsWith(`"`) || attribute.endsWith(`'`)
+        ? attribute.slice(eqIndex + 2, -1)
+        : attribute.slice(eqIndex + 1);
   }
 
-  return { type: "open", tagName, props: props };
+  return { type: "open", tagName, props };
 };

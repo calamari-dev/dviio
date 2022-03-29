@@ -11,24 +11,18 @@ export const combineLoaders = <Ext, Inst extends DviInstruction>(
       return loaders[0];
   }
 
-  const loadersMap = new WeakMap<Loader<Ext, Inst>, Loader<Ext, Inst>[]>();
-
   return class CombinedLoader {
-    constructor() {
-      const instances = loaders.map((Loader) => new Loader());
-      loadersMap.set(this, instances);
-    }
+    private loaders = loaders.map((Loader) => new Loader());
 
     reduce: Loader<Ext, Inst>["reduce"] = async (inst, state) => {
-      for (const loader of loadersMap.get(this) || []) {
+      for (const loader of this.loaders) {
         state = await loader.reduce(inst, state);
       }
 
       return state;
     };
 
-    end = () =>
-      Promise.all((loadersMap.get(this) || []).map((loader) => loader.end?.()));
+    end = () => Promise.all(this.loaders.map((loader) => loader.end?.()));
   };
 };
 

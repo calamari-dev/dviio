@@ -31,7 +31,9 @@ export const dviSvgReducer: Reducer<SvgDraft, SvgExt> = (inst, state) => {
 
       if (width === undefined) {
         throw new Error(
-          `The glyph (codepoint=${codePoint}) in font ${register.f} doesn't have advance width information.`
+          `The glyph (codepoint=${codePoint.toString(16)}) in font k=${
+            register.f
+          } doesn't have advance width information.`
         );
       }
 

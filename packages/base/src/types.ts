@@ -20,6 +20,7 @@ export type PageSpec =
   | "*"
   | number
   | number[]
+  | Set<number>
   | { start?: number; end?: number };
 
 export type Initializer<Draft, Ext = unknown> =
@@ -30,7 +31,7 @@ export type Parser<Input, Inst extends DviInstruction = DviInstruction> = (
   input: Input,
   page: [number, ...number[]] | { start: number; end: number },
   plugin?: Plugin
-) => AsyncGenerator<Inst, void>;
+) => AsyncGenerator<Inst>;
 
 export abstract class Loader<
   Ext = unknown,

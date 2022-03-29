@@ -11,37 +11,33 @@ export const normalizePages = (
       return isNatural(pages) ? [pages] : null;
   }
 
-  if (!Array.isArray(pages)) {
-    let { start = 1, end = Infinity } = pages;
-    start = Math.max(Math.ceil(start), 1);
-    end = Math.floor(end);
+  if (Array.isArray(pages) || pages instanceof Set) {
+    const set = new Set(pages);
+    set.delete(undefined as unknown as number);
+    const result = [...set].filter(isNatural).sort(subtract);
 
-    if (start > end || start === Infinity || end === -Infinity) {
-      return null;
+    switch (result.length) {
+      case 0:
+        return null;
+
+      case 1:
+        return result as [number];
     }
 
-    return start === end ? [start] : { start, end };
+    return result.length - 1 === result[result.length - 1] - result[0]
+      ? { start: result[0], end: result[result.length - 1] }
+      : (result as [number, ...number[]]);
   }
 
-  if (pages.length === 0) {
+  let { start = 1, end = Infinity } = pages;
+  start = Math.max(Math.ceil(start), 1);
+  end = Math.floor(end);
+
+  if (start > end || start === Infinity || end === -Infinity) {
     return null;
   }
 
-  const set = new Set(pages);
-  set.delete(undefined as unknown as number);
-  const result = [...set].filter(isNatural).sort(subtract);
-
-  switch (result.length) {
-    case 0:
-      return null;
-
-    case 1:
-      return [result[0]];
-  }
-
-  return result.length - 1 === result[result.length - 1] - result[0]
-    ? { start: result[0], end: result[result.length - 1] }
-    : (result as [number, ...number[]]);
+  return start === end ? [start] : { start, end };
 };
 
 const isNatural = (page: number) => page > 0 && Number.isSafeInteger(page);

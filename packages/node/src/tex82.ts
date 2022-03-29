@@ -1,7 +1,7 @@
-import { FileHandle } from "fs/promises";
-import { Root } from "xast";
+import type { FileHandle } from "fs/promises";
+import type { Root } from "xast";
+import type { Preset } from "@dviio/base";
 import { x } from "xastscript";
-import { Preset } from "@dviio/base";
 import { SvgExt, dviSvgReducer, buildSvg } from "@dviio/common";
 import { parseDvi } from "./parseDvi";
 import { TfmLoader } from "./TfmLoader";
