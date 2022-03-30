@@ -8,7 +8,7 @@ export const dviio = <Input, Draft, Output, Ext, Inst extends DviInstruction>(
   preset: Preset<Input, Draft, Output, Ext, Inst>,
   plugins: Plugin[] = []
 ) => {
-  const Loader = combineLoaders(...(preset.loaders || []));
+  const Loader = combineLoaders(...(preset.loaders ?? []));
   const plugin = combinePlugins(...plugins);
 
   return async (input: Input, pages: PageSpec = "*"): Promise<Output> => {
@@ -23,7 +23,8 @@ export const dviio = <Input, Draft, Output, Ext, Inst extends DviInstruction>(
     let state = createState(preset.initializer);
 
     for await (const inst of parser) {
-      Object.assign(state, await loader.reduce(inst, state));
+      const { fonts, extension } = state;
+      Object.assign(state, await loader.reduce(inst, { fonts, extension }));
       state = preset.reducer(inst, state);
     }
 

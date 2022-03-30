@@ -30,7 +30,7 @@ export type Initializer<Draft, Ext = unknown> =
 export type Parser<Input, Inst extends DviInstruction = DviInstruction> = (
   input: Input,
   page: [number, ...number[]] | { start: number; end: number },
-  plugin?: Plugin
+  plugin: Plugin
 ) => AsyncGenerator<Inst>;
 
 export abstract class Loader<
@@ -52,12 +52,12 @@ export type Reducer<
 
 export type Builder<Draft, Output> = (draft: Draft) => Output;
 
-export type LoaderState<Ext = never> = Pick<
+export type LoaderState<Ext = unknown> = Pick<
   State<unknown, Ext>,
   "fonts" | "extension"
 >;
 
-export type State<Draft, Ext = never> = {
+export type State<Draft, Ext = unknown> = {
   register: { [T in "h" | "v" | "w" | "x" | "y" | "z" | "f"]: number };
   stack: Omit<State<unknown>["register"], "f">[];
   numer: number;

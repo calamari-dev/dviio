@@ -117,8 +117,7 @@ export const parseDvi: Parser<FileHandle> = async function* (
       }
 
       case "XXX": {
-        const special = plugin && plugin(inst);
-        yield special ? special : inst;
+        yield plugin(inst) ?? inst;
         index += byteLength;
         continue;
       }
