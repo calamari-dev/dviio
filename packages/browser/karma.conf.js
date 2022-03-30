@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 process.env.CHROME_BIN = require("puppeteer").executablePath();
-const ts = require("rollup-plugin-ts");
 const resolve = require("@rollup/plugin-node-resolve").default;
+const ts = require("rollup-plugin-ts");
 
 module.exports = function (config) {
   config.set({
