@@ -8,10 +8,10 @@ export { SvgDraft, SvgExt, dviSvgReducer } from "./dviSvgReducer";
 export { dviDumpReducer } from "./dviDumpReducer";
 export { hyperTexPlugin } from "./hyperTexPlugin";
 
-export const buildSvg = (draft: SvgDraft): string => {
+export const buildSvg = async (draft: SvgDraft): Promise<string> => {
   return toXml(draft);
 };
 
-export const buildYaml = (draft: DumpDraft): string => {
+export const buildYaml = async (draft: DumpDraft): Promise<string> => {
   return dump(draft);
 };

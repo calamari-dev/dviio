@@ -1,15 +1,26 @@
-import type { Preset, Plugin, DviInstruction, PageSpec } from "./types";
+import type { Preset, Plugin, PageSpec } from "./types";
 import { createState } from "./createState";
 import { combinePlugins } from "./combinePlugins";
-import { combineLoaders } from "./combineLoaders";
 import { normalizePages } from "./normalizePages";
 
-export const dviio = <Input, Draft, Output, Ext, Inst extends DviInstruction>(
-  preset: Preset<Input, Draft, Output, Ext, Inst>,
+export const dviio = <
+  Input,
+  Draft,
+  Output,
+  Ext,
+  Asset,
+  Inst extends { name: string }
+>(
+  preset: Preset<Input, Draft, Output, Ext, Asset, Inst>,
   plugins: Plugin[] = []
 ) => {
-  const Loader = combineLoaders(...(preset.loaders ?? []));
   const plugin = combinePlugins(...plugins);
+  preset = { ...preset };
+
+  if (typeof preset.initializer !== "function") {
+    const { draft, extension } = createState(preset.initializer);
+    preset.initializer = { draft, extension };
+  }
 
   return async (input: Input, pages: PageSpec = "*"): Promise<Output> => {
     const normalized = normalizePages(pages);
@@ -19,16 +30,17 @@ export const dviio = <Input, Draft, Output, Ext, Inst extends DviInstruction>(
     }
 
     const parser = preset.parser(input, normalized, plugin);
-    const loader = new Loader();
+    const loader = preset?.loader && new preset.loader();
     let state = createState(preset.initializer);
 
     for await (const inst of parser) {
       const { fonts, extension } = state;
-      Object.assign(state, await loader.reduce(inst, { fonts, extension }));
+      Object.assign(state, await loader?.reduce(inst, { fonts, extension }));
       state = preset.reducer(inst, state);
     }
 
-    await loader.end?.();
-    return preset.builder(state.draft);
+    const asset = await loader?.getAsset();
+    await loader?.end?.();
+    return preset.builder(state.draft, asset as Asset);
   };
 };

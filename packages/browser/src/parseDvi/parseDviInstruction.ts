@@ -323,7 +323,7 @@ const getInt = (view: DataView, byteLength: number): number => {
     return k < 0x800000 ? k : k - 0x1000000;
   }
 
-  return -1;
+  return NaN;
 };
 
 const getUint = (view: DataView, byteLength: number): number => {
@@ -342,5 +342,5 @@ const getUint = (view: DataView, byteLength: number): number => {
     return k;
   }
 
-  return -1;
+  return NaN;
 };

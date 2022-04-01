@@ -1,16 +1,32 @@
+type IsReservedInst<T extends { name: string }> = T["name"] &
+  (DviInstruction["name"] | `$${string}`) extends never
+  ? false
+  : true;
+
 export type Preset<
   Input,
   Draft,
   Output = Draft,
   Ext = unknown,
-  Inst extends DviInstruction = DviInstruction
-> = {
-  initializer: Initializer<Draft, Ext>;
-  parser: Parser<Input, Inst>;
-  loaders?: { new (): Loader<Ext, Inst> }[];
-  reducer: Reducer<Draft, Ext, Inst>;
-  builder: Builder<Draft, Output>;
-};
+  Asset = never,
+  Inst extends { name: string } = never
+> = IsReservedInst<Inst> extends true
+  ? never
+  : [Asset] extends [never]
+  ? {
+      initializer: Initializer<Draft, Ext>;
+      parser: Parser<Input, Inst>;
+      loader?: { new (): Loader<Ext, unknown, Inst> };
+      reducer: Reducer<Draft, Ext, Inst>;
+      builder: Builder<Draft, Output, Asset>;
+    }
+  : {
+      initializer: Initializer<Draft, Ext>;
+      parser: Parser<Input, Inst>;
+      loader: { new (): Loader<Ext, Asset, Inst> };
+      reducer: Reducer<Draft, Ext, Inst>;
+      builder: Builder<Draft, Output, Asset>;
+    };
 
 export type Plugin = (
   inst: DviInstruction & { name: "XXX" }
@@ -27,30 +43,47 @@ export type Initializer<Draft, Ext = unknown> =
   | { draft: Draft; extension: Ext }
   | (() => { draft: Draft; extension: Ext });
 
-export type Parser<Input, Inst extends DviInstruction = DviInstruction> = (
-  input: Input,
-  page: [number, ...number[]] | { start: number; end: number },
-  plugin: Plugin
-) => AsyncGenerator<Inst>;
+export type Parser<
+  Input,
+  Inst extends { name: string } = never
+> = IsReservedInst<Inst> extends true
+  ? never
+  : (
+      input: Input,
+      page: [number, ...number[]] | { start: number; end: number },
+      plugin: Plugin
+    ) => AsyncGenerator<Inst | DviInstruction>;
 
-export abstract class Loader<
+export type Loader<
   Ext = unknown,
-  Inst extends DviInstruction = DviInstruction
-> {
-  abstract reduce<T extends Inst, U extends LoaderState<Ext>>(
-    inst: T,
-    state: U
-  ): Promise<U>;
-  abstract end?(): Promise<unknown>;
-}
+  Asset = unknown,
+  Inst extends { name: string } = never
+> = IsReservedInst<Inst> extends true
+  ? never
+  : {
+      reduce(
+        inst: Inst | DviInstruction,
+        state: LoaderState<Ext>
+      ): Promise<LoaderState<Ext>>;
+      getAsset(): Promise<Asset>;
+      end?(): Promise<unknown>;
+    };
 
 export type Reducer<
   Draft,
   Ext = unknown,
-  Inst extends DviInstruction = DviInstruction
-> = <T extends Inst, U extends State<Draft, Ext>>(inst: T, state: U) => U;
+  Inst extends { name: string } = never
+> = IsReservedInst<Inst> extends true
+  ? never
+  : (
+      inst: Inst | DviInstruction,
+      state: State<Draft, Ext>
+    ) => State<Draft, Ext>;
 
-export type Builder<Draft, Output> = (draft: Draft) => Output;
+export type Builder<Draft, Output, Asset = never> = (
+  draft: Draft,
+  asset: Asset
+) => Promise<Output>;
 
 export type LoaderState<Ext = unknown> = Pick<
   State<unknown, Ext>,
@@ -75,8 +108,9 @@ export type State<Draft, Ext = unknown> = {
   };
 };
 
-export type DviInstruction =
-  | SpecialInstruction
+export type DviInstruction = PlainInstruction | SpecialInstruction;
+
+export type PlainInstruction =
   | { name: "SET"; codePoint: number }
   | { name: "SET_RULE"; width: number; height: number }
   | { name: "PUT"; codePoint: number }
