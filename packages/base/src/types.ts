@@ -50,13 +50,14 @@ export type ParserConstructor<
 > = { new (input: Input): Parser<Pointer, Inst> };
 
 export type Parser<Pointer, Inst extends ExtendedInstruction = never> = {
+  init?(): Promise<unknown>;
+  finally?(): Promise<unknown>;
   getPrePointer(): Promise<Pointer>;
   getPostPostPointer(): Promise<Pointer>;
   parse(pointer: Pointer): Promise<{
     inst: Inst | ParserInstruction<Pointer>;
     next: Pointer;
   }>;
-  finally?(): Promise<void>;
 };
 
 export type LoaderConstructor<
@@ -70,12 +71,13 @@ export type Loader<
   Asset = unknown,
   Inst extends ExtendedInstruction = never
 > = {
+  init?(): Promise<unknown>;
+  finally?(): Promise<unknown>;
   reduce(
     inst: Inst | ReducerInstruction,
     state: LoaderState<Ext>
   ): Promise<LoaderState<Ext>>;
   getAsset(): Promise<Asset>;
-  finally?(): Promise<unknown>;
 };
 
 export type Reducer<

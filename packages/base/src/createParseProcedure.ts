@@ -1,7 +1,7 @@
 import type { ExtendedInstruction, ParserInstruction } from "./instruction";
 import type { Parser, Plugin } from "./types";
 
-export const createRoutine = async function* <
+export const createParseProcedure = async function* <
   Pointer,
   Inst extends ExtendedInstruction = never
 >(

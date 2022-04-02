@@ -1,9 +1,9 @@
 import type { ExtendedInstruction } from "./instruction";
 import type { Preset, Plugin, PageSpec } from "./types";
-import { createState } from "./createState";
 import { combinePlugins } from "./combinePlugins";
 import { normalizePages } from "./normalizePages";
-import { createRoutine } from "./createRoutine";
+import { createState } from "./createState";
+import { createParseProcedure } from "./createParseProcedure";
 
 export const dviio = <
   Input,
@@ -36,9 +36,11 @@ export const dviio = <
     let output: Output;
 
     try {
+      await Promise.all([parser.init?.(), loader?.init?.()]);
+      const procedure = createParseProcedure(parser, normalized, plugin);
       let state = createState(preset.initializer);
 
-      for await (const inst of createRoutine(parser, normalized, plugin)) {
+      for await (const inst of procedure) {
         const { fonts, extension } = state;
         Object.assign(state, await loader?.reduce(inst, { fonts, extension }));
         state = preset.reducer(inst, state);

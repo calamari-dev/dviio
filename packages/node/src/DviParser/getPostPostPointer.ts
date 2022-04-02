@@ -1,7 +1,9 @@
 import type { FileHandle } from "fs/promises";
 
-export const getPostPostIndex = async (handle: FileHandle): Promise<number> => {
-  const buffer = Buffer.alloc(1);
+export const getPostPostPointer = async (
+  handle: FileHandle,
+  buffer: Buffer
+): Promise<number> => {
   let index = (await handle.stat()).size;
   let opcode = 223;
 

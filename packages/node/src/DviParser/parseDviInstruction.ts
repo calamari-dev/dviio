@@ -1,12 +1,12 @@
 import type { FileHandle } from "fs/promises";
-import type { DviInstruction } from "@dviio/base";
+import type { ParserInstruction } from "@dviio/base";
 import { Buffer } from "buffer";
 
 export const parseDviInstruction = async (
   handle: FileHandle,
   index: number,
   buffer: Buffer
-): Promise<{ byteLength: number; inst: DviInstruction }> => {
+): Promise<{ byteLength: number; inst: ParserInstruction<number> }> => {
   await handle.read({ buffer, length: 1, position: index });
   const opcode = buffer.readUint8(0);
 
@@ -73,7 +73,9 @@ export const parseDviInstruction = async (
   // BOP
   if (opcode === 139) {
     await handle.read({ buffer, length: 44, position: index + 1 });
-    const count = [] as unknown as (DviInstruction & { name: "BOP" })["count"];
+    const count = [] as unknown as (ParserInstruction<number> & {
+      name: "BOP";
+    })["count"];
 
     for (let i = 0; i < 10; i++) {
       count[i] = buffer.readInt32BE(4 * i);
@@ -81,7 +83,7 @@ export const parseDviInstruction = async (
 
     return {
       byteLength: 45,
-      inst: { name: "BOP", bopIndex: buffer.readInt32BE(40), count },
+      inst: { name: "BOP", bopPointer: buffer.readInt32BE(40), count },
     };
   }
 
@@ -277,7 +279,7 @@ export const parseDviInstruction = async (
       byteLength: 29,
       inst: {
         name: "POST",
-        bopIndex: buffer.readUint32BE(0),
+        bopPointer: buffer.readUint32BE(0),
         numer: buffer.readUint32BE(4),
         denom: buffer.readUint32BE(8),
         mag: buffer.readUint32BE(12),
@@ -297,7 +299,7 @@ export const parseDviInstruction = async (
       byteLength: 6,
       inst: {
         name: "POST_POST",
-        postIndex: buffer.readUint32BE(0),
+        postPointer: buffer.readUint32BE(0),
         version: buffer.readUint8(4),
       },
     };
