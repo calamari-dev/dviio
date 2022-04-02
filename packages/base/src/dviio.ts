@@ -1,7 +1,9 @@
+import type { ExtendedInstruction } from "./instruction";
 import type { Preset, Plugin, PageSpec } from "./types";
 import { createState } from "./createState";
 import { combinePlugins } from "./combinePlugins";
 import { normalizePages } from "./normalizePages";
+import { createRoutine } from "./createRoutine";
 
 export const dviio = <
   Input,
@@ -9,7 +11,7 @@ export const dviio = <
   Output,
   Ext,
   Asset,
-  Inst extends { name: string }
+  Inst extends ExtendedInstruction
 >(
   preset: Preset<Input, Draft, Output, Ext, Asset, Inst>,
   plugins: Plugin[] = []
@@ -29,18 +31,25 @@ export const dviio = <
       throw new Error("Given page is invalid.");
     }
 
-    const parser = preset.parser(input, normalized, plugin);
+    const parser = new preset.parser(input);
     const loader = preset?.loader && new preset.loader();
-    let state = createState(preset.initializer);
+    let output: Output;
 
-    for await (const inst of parser) {
-      const { fonts, extension } = state;
-      Object.assign(state, await loader?.reduce(inst, { fonts, extension }));
-      state = preset.reducer(inst, state);
+    try {
+      let state = createState(preset.initializer);
+
+      for await (const inst of createRoutine(parser, normalized, plugin)) {
+        const { fonts, extension } = state;
+        Object.assign(state, await loader?.reduce(inst, { fonts, extension }));
+        state = preset.reducer(inst, state);
+      }
+
+      const asset = await loader?.getAsset();
+      output = await preset.builder(state.draft, asset as Asset);
+    } finally {
+      await Promise.all([parser.finally?.(), loader?.finally?.()]);
     }
 
-    const asset = await loader?.getAsset();
-    await loader?.end?.();
-    return preset.builder(state.draft, asset as Asset);
+    return output;
   };
 };

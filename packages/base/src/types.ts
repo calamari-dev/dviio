@@ -1,36 +1,9 @@
-type IsReservedInst<T extends { name: string }> = T["name"] &
-  (DviInstruction["name"] | `$${string}`) extends never
-  ? false
-  : true;
-
-export type Preset<
-  Input,
-  Draft,
-  Output = Draft,
-  Ext = unknown,
-  Asset = never,
-  Inst extends { name: string } = never
-> = IsReservedInst<Inst> extends true
-  ? never
-  : [Asset] extends [never]
-  ? {
-      initializer: Initializer<Draft, Ext>;
-      parser: Parser<Input, Inst>;
-      loader?: { new (): Loader<Ext, unknown, Inst> };
-      reducer: Reducer<Draft, Ext, Inst>;
-      builder: Builder<Draft, Output, Asset>;
-    }
-  : {
-      initializer: Initializer<Draft, Ext>;
-      parser: Parser<Input, Inst>;
-      loader: { new (): Loader<Ext, Asset, Inst> };
-      reducer: Reducer<Draft, Ext, Inst>;
-      builder: Builder<Draft, Output, Asset>;
-    };
-
-export type Plugin = (
-  inst: DviInstruction & { name: "XXX" }
-) => SpecialInstruction | null;
+import type {
+  ExtendedInstruction,
+  ParserInstruction,
+  ReducerInstruction,
+  SpecialInstruction,
+} from "./instruction";
 
 export type PageSpec =
   | "*"
@@ -39,46 +12,80 @@ export type PageSpec =
   | Set<number>
   | { start?: number; end?: number };
 
+export type Preset<
+  Input,
+  Draft,
+  Output = Draft,
+  Ext = unknown,
+  Asset = never,
+  Inst extends ExtendedInstruction = never
+> = [Asset] extends [never]
+  ? {
+      initializer: Initializer<Draft, Ext>;
+      parser: ParserConstructor<Input, unknown, Inst>;
+      loader?: LoaderConstructor<Ext, unknown, Inst>;
+      reducer: Reducer<Draft, Ext, Inst>;
+      builder: Builder<Draft, Output, Asset>;
+    }
+  : {
+      initializer: Initializer<Draft, Ext>;
+      parser: ParserConstructor<Input, unknown, Inst>;
+      loader: LoaderConstructor<Ext, Asset, Inst>;
+      reducer: Reducer<Draft, Ext, Inst>;
+      builder: Builder<Draft, Output, Asset>;
+    };
+
+export type Plugin = (
+  inst: ReducerInstruction & { name: "XXX" }
+) => SpecialInstruction | null;
+
 export type Initializer<Draft, Ext = unknown> =
   | { draft: Draft; extension: Ext }
   | (() => { draft: Draft; extension: Ext });
 
-export type Parser<
+export type ParserConstructor<
   Input,
-  Inst extends { name: string } = never
-> = IsReservedInst<Inst> extends true
-  ? never
-  : (
-      input: Input,
-      page: [number, ...number[]] | { start: number; end: number },
-      plugin: Plugin
-    ) => AsyncGenerator<Inst | DviInstruction>;
+  Pointer,
+  Inst extends ExtendedInstruction = never
+> = { new (input: Input): Parser<Pointer, Inst> };
+
+export type Parser<Pointer, Inst extends ExtendedInstruction = never> = {
+  getPrePointer(): Promise<Pointer>;
+  getPostPostPointer(): Promise<Pointer>;
+  parse(pointer: Pointer): Promise<{
+    inst: Inst | ParserInstruction<Pointer>;
+    next: Pointer;
+  }>;
+  finally?(): Promise<void>;
+};
+
+export type LoaderConstructor<
+  Ext = unknown,
+  Asset = unknown,
+  Inst extends ExtendedInstruction = never
+> = { new (): Loader<Ext, Asset, Inst> };
 
 export type Loader<
   Ext = unknown,
   Asset = unknown,
-  Inst extends { name: string } = never
-> = IsReservedInst<Inst> extends true
-  ? never
-  : {
-      reduce(
-        inst: Inst | DviInstruction,
-        state: LoaderState<Ext>
-      ): Promise<LoaderState<Ext>>;
-      getAsset(): Promise<Asset>;
-      end?(): Promise<unknown>;
-    };
+  Inst extends ExtendedInstruction = never
+> = {
+  reduce(
+    inst: Inst | ReducerInstruction,
+    state: LoaderState<Ext>
+  ): Promise<LoaderState<Ext>>;
+  getAsset(): Promise<Asset>;
+  finally?(): Promise<unknown>;
+};
 
 export type Reducer<
   Draft,
   Ext = unknown,
-  Inst extends { name: string } = never
-> = IsReservedInst<Inst> extends true
-  ? never
-  : (
-      inst: Inst | DviInstruction,
-      state: State<Draft, Ext>
-    ) => State<Draft, Ext>;
+  Inst extends ExtendedInstruction = never
+> = (
+  inst: Inst | ReducerInstruction,
+  state: State<Draft, Ext>
+) => State<Draft, Ext>;
 
 export type Builder<Draft, Output, Asset = never> = (
   draft: Draft,
@@ -107,83 +114,3 @@ export type State<Draft, Ext = unknown> = {
     };
   };
 };
-
-export type DviInstruction = PlainInstruction | SpecialInstruction;
-
-export type PlainInstruction =
-  | { name: "SET"; codePoint: number }
-  | { name: "SET_RULE"; width: number; height: number }
-  | { name: "PUT"; codePoint: number }
-  | { name: "PUT_RULE"; width: number; height: number }
-  | { name: "NOP" }
-  | {
-      name: "BOP";
-      bopIndex: number;
-      count: [
-        number,
-        number,
-        number,
-        number,
-        number,
-        number,
-        number,
-        number,
-        number,
-        number
-      ];
-    }
-  | { name: "EOP" }
-  | { name: "PUSH" }
-  | { name: "POP" }
-  | { name: "RIGHT"; movement: number }
-  | { name: "W"; movement?: number }
-  | { name: "X"; movement?: number }
-  | { name: "DOWN"; movement: number }
-  | { name: "Y"; movement?: number }
-  | { name: "Z"; movement?: number }
-  | { name: "FNT"; fontIndex: number }
-  | { name: "XXX"; x: string }
-  | {
-      name: "FNT_DEF";
-      fontIndex: number;
-      checksum: number;
-      scaleFactor: number;
-      designSize: number;
-      directory: string;
-      filename: string;
-    }
-  | {
-      name: "PRE";
-      version: number;
-      numer: number;
-      denom: number;
-      mag: number;
-      comment: string;
-    }
-  | {
-      name: "POST";
-      bopIndex: number;
-      numer: number;
-      denom: number;
-      mag: number;
-      maxHeight: number;
-      maxWidth: number;
-      stackDepth: number;
-      totalPages: number;
-    }
-  | {
-      name: "POST_POST";
-      version: number;
-      postIndex: number;
-    }
-  | { name: "UNDEFINED"; opcode: number };
-
-export type SpecialInstruction =
-  | { name: "$BEGIN_ANCHOR_HREF"; href: string }
-  | { name: "$BEGIN_ANCHOR_NAME"; htmlName: string }
-  | { name: "$END_ANCHOR" }
-  | { name: "$SET_BASE_URL"; href: string }
-  | { name: "$COLOR"; color: string }
-  | { name: "$COLOR_PUSH"; color: string }
-  | { name: "$COLOR_POP" }
-  | { name: "$BACKGROUND_COLOR"; color: string };
