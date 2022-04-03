@@ -13,7 +13,8 @@
     "packages\\base",
     "packages\\common",
     "packages\\node",
-    "packages\\browser"
+    "packages\\browser",
+    "packages\\dump"
   ],
   "devDependencies": {
     "@babel/core": "^7.17.8",

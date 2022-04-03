@@ -13,15 +13,17 @@ export const dviio = <
   Asset,
   Inst extends ExtendedInstruction
 >(
-  preset: Preset<Input, Draft, Output, Ext, Asset, Inst>,
+  preset:
+    | Preset<Input, Draft, Output, Ext, Asset, Inst>
+    | (() => Preset<Input, Draft, Output, Ext, Asset, Inst>),
   plugins: Plugin[] = []
 ) => {
+  const $preset = { ...(typeof preset === "function" ? preset() : preset) };
   const plugin = combinePlugins(...plugins);
-  preset = { ...preset };
 
-  if (typeof preset.initializer !== "function") {
-    const { draft, extension } = createState(preset.initializer);
-    preset.initializer = { draft, extension };
+  if (typeof $preset.initializer !== "function") {
+    const { draft, extension } = createState($preset.initializer);
+    $preset.initializer = { draft, extension };
   }
 
   return async (input: Input, pages: PageSpec = "*"): Promise<Output> => {
@@ -31,27 +33,24 @@ export const dviio = <
       throw new Error("Given page is invalid.");
     }
 
-    const parser = new preset.parser(input);
-    const loader = preset?.loader && new preset.loader();
-    let output: Output;
+    const parser = new $preset.parser(input);
+    const loader = $preset?.loader && new $preset.loader();
 
     try {
       await Promise.all([parser.init?.(), loader?.init?.()]);
       const procedure = createParseProcedure(parser, normalized, plugin);
-      let state = createState(preset.initializer);
+      let state = createState($preset.initializer);
 
       for await (const inst of procedure) {
         const { fonts, extension } = state;
         Object.assign(state, await loader?.reduce(inst, { fonts, extension }));
-        state = preset.reducer(inst, state);
+        state = $preset.reducer(inst, state);
       }
 
       const asset = await loader?.getAsset();
-      output = await preset.builder(state.draft, asset as Asset);
+      return $preset.builder(state.draft, asset as Asset);
     } finally {
       await Promise.all([parser.finally?.(), loader?.finally?.()]);
     }
-
-    return output;
   };
 };

@@ -1,0 +1,32 @@
+{
+  "name": "@dviio/dump",
+  "version": "0.1.0",
+  "description": "",
+  "main": "dist/index.cjs",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "unpkg": "dist/iife.js",
+  "jsdelivr": "dist/iife.js",
+  "scripts": {
+    "test": "jest",
+    "build": "rollup --config rollup.config.js",
+    "prebuild": "rimraf dist"
+  },
+  "author": "calamari-dev",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/calamari-dev/dviio/issues"
+  },
+  "homepage": "https://github.com/calamari-dev/dviio#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/calamari-dev/dviio.git"
+  },
+  "dependencies": {
+    "@dviio/base": "^0.1.0",
+    "js-yaml": "^4.1.0"
+  },
+  "devDependencies": {
+    "@types/js-yaml": "^4.0.5"
+  }
+}

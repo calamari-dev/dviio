@@ -17,13 +17,10 @@ ES2018 以降をサポートする任意の環境で動作する DVI 操作ユ�
 ## Example
 
 ```typescript
-import { open } from "fs/promises";
 import { dviio, yaml } from "@dviio/node";
 
-const toYaml = dviio(yaml);
-
 (async () => {
-  const handle = await open("dvi-file-path", "r");
-  console.log(await toYaml(handle, "*"));
+  const toYaml = dviio(yaml);
+  console.log(await toYaml("dvi-file-path", "*"));
 })();
 ```

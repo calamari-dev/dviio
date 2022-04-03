@@ -308,6 +308,21 @@ export const parseDviInstruction = async (
   return { byteLength: 1, inst: { name: "UNDEFINED", opcode } };
 };
 
+const readUint = (buffer: Buffer, byteLength: number): number => {
+  switch (byteLength) {
+    case 1:
+      return buffer.readUint8(0);
+    case 2:
+      return buffer.readUint16BE(0);
+    case 3:
+      return buffer.readUint16BE(1) + 0x10000 * buffer.readUint8(0);
+    case 4:
+      return buffer.readUint32BE(0);
+  }
+
+  return NaN;
+};
+
 const readInt = (buffer: Buffer, byteLength: number): number => {
   switch (byteLength) {
     case 1:
@@ -318,30 +333,10 @@ const readInt = (buffer: Buffer, byteLength: number): number => {
       return buffer.readInt32BE(0);
   }
 
-  if (byteLength === 3) {
-    let k = buffer.readUint16BE(1);
-    k += 0x10000 * buffer.readUint8(0);
-    return k < 0x800000 ? k : k - 0x1000000;
+  if (byteLength !== 3) {
+    return NaN;
   }
 
-  return NaN;
-};
-
-const readUint = (buffer: Buffer, byteLength: number): number => {
-  switch (byteLength) {
-    case 1:
-      return buffer.readUint8(0);
-    case 2:
-      return buffer.readUint16BE(0);
-    case 4:
-      return buffer.readUint32BE(0);
-  }
-
-  if (byteLength === 3) {
-    let k = buffer.readUint16BE(1);
-    k += 0x10000 * buffer.readUint8(0);
-    return k;
-  }
-
-  return NaN;
+  const k = buffer.readUint16BE(1) + 0x10000 * buffer.readUint8(0);
+  return k < 0x800000 ? k : k - 0x1000000;
 };

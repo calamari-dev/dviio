@@ -1,4 +1,5 @@
-import { DviInstruction } from "@dviio/base";
+import type { annotationSymbol, commentSymbol } from "./symbols";
+import { ReducerInstruction } from "@dviio/base";
 
 export type DumpDraft = {
   preamble: {
@@ -23,10 +24,17 @@ export type DumpDraft = {
     };
   };
   document: Array<
-    | Omit<{ name: "BOP" } & DviInstruction, "bopIndex">
-    | Exclude<
-        DviInstruction,
-        { name: "PRE" | "POST" | "POST_POST" | "BOP" | "FNT_DEF" }
-      >
+    | Element
+    | { name: typeof commentSymbol; comment: string }
+    | {
+        name: typeof annotationSymbol;
+        inst: Element;
+        annotation?: { [T in string]?: string };
+      }
   >;
 };
+
+type Element = Exclude<
+  ReducerInstruction,
+  { name: "PRE" | "POST" | "POST_POST" | "FNT_DEF" }
+>;
