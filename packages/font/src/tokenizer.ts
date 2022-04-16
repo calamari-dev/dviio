@@ -1,7 +1,11 @@
+import { toNumber } from "./toNumber";
 import { Tokenizer } from "./types";
+import { unescape } from "./unescape";
+
+const irregularCharactersRegExp = /[()<>{}[\]/%\s]/;
 
 export const tokenizer: Tokenizer<string> = async function* (program) {
-  while (1) {
+  while (program.length > 0) {
     const firstChar = program[0];
 
     if (/\s/.test(firstChar)) {
@@ -120,30 +124,21 @@ export const tokenizer: Tokenizer<string> = async function* (program) {
         const i = program.search(irregularCharactersRegExp);
 
         if (i === -1) {
-          yield { type: "EXECUTABLE_NAME", value: program };
+          const number = toNumber(program);
+          yield number === null
+            ? { type: "EXECUTABLE_NAME", value: program }
+            : { type: "NUMBER", value: number };
           return;
         }
 
-        yield { type: "EXECUTABLE_NAME", value: program.slice(0, i) };
+        const literal = program.slice(0, i);
+        const number = toNumber(literal);
+        yield number === null
+          ? { type: "EXECUTABLE_NAME", value: literal }
+          : { type: "NUMBER", value: number };
         program = program.slice(i);
         continue;
       }
     }
   }
-};
-
-const irregularCharactersRegExp = /[()<>{}[\]/%\s]/;
-
-const unescape = (escaped: string): string => {
-  return escaped
-    .replace(/\\\n/g, "")
-    .replace(/\\n/g, "\n")
-    .replace(/\\r/g, "\r")
-    .replace(/\\t/g, "\t")
-    .replace(/\\b/g, "\b")
-    .replace(/\\f/g, "\f")
-    .replace(/\\\(/g, "(")
-    .replace(/\\\)/g, ")")
-    .replace(/\\([0-7]{1,3})/g, (_, x) => String.fromCharCode(parseInt(x, 8)))
-    .replace(/\\/g, "\\");
 };
