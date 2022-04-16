@@ -1,6 +1,5 @@
-import type { Reducer, ReducerInstruction } from "@dviio/base";
-import { annotationSymbol, commentSymbol } from "./symbols";
-import { DumpDraft } from "./types";
+import type { Reducer } from "@dviio/base";
+import type { DumpDraft } from "./types";
 
 export const dviDumpReducer: Reducer<DumpDraft> = (inst, state) => {
   switch (inst.name) {
@@ -31,23 +30,6 @@ export const dviDumpReducer: Reducer<DumpDraft> = (inst, state) => {
 
     case "FNT_DEF": {
       state.draft.fonts[inst.fontIndex] = getOmitted(inst, "name");
-      return state;
-    }
-
-    case "SET_RULE":
-    case "PUT_RULE": {
-      const { document } = state.draft;
-      const sp = (state.numer / state.denom) * 1e-7 * 2834.65;
-
-      document.push({
-        name: annotationSymbol,
-        inst,
-        annotation: {
-          width: `${inst.width * sp} pt`,
-          height: `${inst.height * sp} pt`,
-        },
-      });
-
       return state;
     }
 

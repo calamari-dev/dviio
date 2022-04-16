@@ -1,4 +1,3 @@
-import type { annotationSymbol, commentSymbol } from "./symbols";
 import { ReducerInstruction } from "@dviio/base";
 
 export type DumpDraft = {
@@ -24,17 +23,9 @@ export type DumpDraft = {
     };
   };
   document: Array<
-    | Element
-    | { name: typeof commentSymbol; comment: string }
-    | {
-        name: typeof annotationSymbol;
-        inst: Element;
-        annotation?: { [T in string]?: string };
-      }
+    Exclude<
+      ReducerInstruction,
+      { name: "PRE" | "POST" | "POST_POST" | "FNT_DEF" }
+    >
   >;
 };
-
-type Element = Exclude<
-  ReducerInstruction,
-  { name: "PRE" | "POST" | "POST_POST" | "FNT_DEF" }
->;

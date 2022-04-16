@@ -1,7 +1,7 @@
 import type { ExtendedInstruction } from "./instruction";
 import type { Preset, Plugin, PageSpec } from "./types";
 import { combinePlugins } from "./combinePlugins";
-import { normalizePages } from "./normalizePages";
+import { normalizePageSpec } from "./normalizePageSpec";
 import { createState } from "./createState";
 import { createParseProcedure } from "./createParseProcedure";
 
@@ -27,7 +27,7 @@ export const dviio = <
   }
 
   return async (input: Input, pages: PageSpec = "*"): Promise<Output> => {
-    const normalized = normalizePages(pages);
+    const normalized = normalizePageSpec(pages);
 
     if (normalized === null) {
       throw new Error("Given page is invalid.");

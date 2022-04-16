@@ -1,6 +1,6 @@
 import type { PageSpec } from "./types";
 
-export const normalizePages = (
+export const normalizePageSpec = (
   pages: PageSpec
 ): { start: number; end: number } | [number, ...number[]] | null => {
   switch (typeof pages) {
