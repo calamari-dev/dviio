@@ -5,64 +5,64 @@ import { unescape } from "./unescape";
 
 const irregularCharactersRegExp = /[()<>{}[\]/%\s]/;
 
-export const tokenizer: Tokenizer<string> = async function* (program) {
+export const tokenizer: Tokenizer<string> = async function* (code) {
   while (true) {
-    program = program.trim();
+    code = code.trim();
 
-    if (program.length === 0) {
+    if (code.length === 0) {
       break;
     }
 
-    if (program.startsWith("<~")) {
-      const i = program.indexOf("~>");
+    if (code.startsWith("<~")) {
+      const i = code.indexOf("~>");
 
       if (i === -1) {
         throw new Error();
       }
 
-      const value = decodeAscii85(program.slice(2, i));
+      const value = decodeAscii85(code.slice(2, i));
 
       if (value === null) {
         throw new Error();
       }
 
       yield { type: "STRING", value };
-      program = program.slice(i + 2);
+      code = code.slice(i + 2);
       continue;
     }
 
-    switch (program[0]) {
+    switch (code[0]) {
       case "%": {
-        program = program.slice(1);
-        const i = program.indexOf("\n");
+        code = code.slice(1);
+        const i = code.indexOf("\n");
 
         if (i === -1) {
-          yield { type: "COMMENT", value: program };
+          yield { type: "COMMENT", value: code };
           return;
         }
 
-        yield { type: "COMMENT", value: program.slice(0, i) };
-        program = program.slice(i + 1);
+        yield { type: "COMMENT", value: code.slice(0, i) };
+        code = code.slice(i + 1);
         continue;
       }
 
       case "(": {
-        program = program.slice(1);
+        code = code.slice(1);
         let value = "";
 
         for (let k = 1; k > 0; ) {
-          const i = program.search(/[()]/);
+          const i = code.search(/[()]/);
 
           if (i === -1) {
             throw new Error();
           }
 
-          if (i === 0 || program[i - 1] !== "\\") {
-            k += program[i] === ")" ? -1 : 1;
+          if (i === 0 || code[i - 1] !== "\\") {
+            k += code[i] === ")" ? -1 : 1;
           }
 
-          value += program.slice(0, i + 1);
-          program = program.slice(i + 1);
+          value += code.slice(0, i + 1);
+          code = code.slice(i + 1);
         }
 
         yield { type: "STRING", value: unescape(value.slice(0, -1)) };
@@ -70,93 +70,90 @@ export const tokenizer: Tokenizer<string> = async function* (program) {
       }
 
       case "<": {
-        program = program.slice(1);
+        code = code.slice(1);
         let value = "";
 
-        while (program[0] !== ">") {
-          if (/\s/.test(program[0])) {
-            program = program.slice(1);
+        while (code[0] !== ">") {
+          if (/\s/.test(code[0])) {
+            code = code.slice(1);
             continue;
           }
 
-          const firstChar = program[0];
-          program = program.slice(1);
+          const firstChar = code[0];
+          code = code.slice(1);
 
-          while (/\s/.test(program[0])) {
-            program = program.slice(1);
+          while (/\s/.test(code[0])) {
+            code = code.slice(1);
           }
 
-          if (program[0] === ">") {
+          if (code[0] === ">") {
             value += String.fromCharCode(parseInt(`${firstChar}0`, 16));
             break;
           }
 
-          value += String.fromCharCode(parseInt(firstChar + program[0], 16));
-          program = program.slice(1);
+          value += String.fromCharCode(parseInt(firstChar + code[0], 16));
+          code = code.slice(1);
         }
 
-        program = program.slice(1);
         yield { type: "STRING", value };
+        code = code.slice(1);
         continue;
       }
 
       case "/": {
-        program = program.slice(1);
-        const i = program.search(irregularCharactersRegExp);
+        code = code.slice(1);
+        const i = code.search(irregularCharactersRegExp);
 
         if (i === -1) {
-          yield { type: "LITERAL_NAME", value: program };
+          yield { type: "LITERAL_NAME", value: code };
           return;
         }
 
-        yield { type: "LITERAL_NAME", value: program.slice(0, i) };
-        program = program.slice(i);
+        yield { type: "LITERAL_NAME", value: code.slice(0, i) };
+        code = code.slice(i);
         continue;
       }
 
       case "[": {
-        program = program.slice(1);
         yield { type: "OPEN_SQUARE_BRACKET" };
+        code = code.slice(1);
         continue;
       }
 
       case "]": {
-        program = program.slice(1);
         yield { type: "CLOSE_SQUARE_BRACKET" };
+        code = code.slice(1);
         continue;
       }
 
       case "{": {
-        program = program.slice(1);
         yield { type: "OPEN_CURLY_BRACKET" };
+        code = code.slice(1);
         continue;
       }
 
       case "}": {
-        program = program.slice(1);
         yield { type: "CLOSE_CURLY_BRACKET" };
-        continue;
-      }
-
-      default: {
-        const i = program.search(irregularCharactersRegExp);
-
-        if (i === -1) {
-          const number = parseNumber(program);
-          yield number === null
-            ? { type: "EXECUTABLE_NAME", value: program }
-            : { type: "NUMBER", value: number };
-          return;
-        }
-
-        const literal = program.slice(0, i);
-        const number = parseNumber(literal);
-        yield number === null
-          ? { type: "EXECUTABLE_NAME", value: literal }
-          : { type: "NUMBER", value: number };
-        program = program.slice(i);
+        code = code.slice(1);
         continue;
       }
     }
+
+    const i = code.search(irregularCharactersRegExp);
+
+    if (i === -1) {
+      const number = parseNumber(code);
+      yield number === null
+        ? { type: "EXECUTABLE_NAME", value: code }
+        : { type: "NUMBER", value: number };
+      return;
+    }
+
+    const literal = code.slice(0, i);
+    const number = parseNumber(literal);
+    yield number === null
+      ? { type: "EXECUTABLE_NAME", value: literal }
+      : { type: "NUMBER", value: number };
+    code = code.slice(i);
   }
 };
