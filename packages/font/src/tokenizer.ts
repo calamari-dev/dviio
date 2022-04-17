@@ -1,16 +1,19 @@
-import { toNumber } from "./toNumber";
+import { parseNumber } from "./parseNumber";
 import { Tokenizer } from "./types";
 import { unescape } from "./unescape";
 
 const irregularCharactersRegExp = /[()<>{}[\]/%\s]/;
 
 export const tokenizer: Tokenizer<string> = async function* (program) {
-  while (program.length > 0) {
-    const firstChar = program[0];
+  while (true) {
+    program = program.trim();
 
-    if (/\s/.test(firstChar)) {
-      program = program.slice(1);
-      continue;
+    if (program.length === 0) {
+      break;
+    }
+
+    if (program[0] === "<" && program[1] === "~") {
+      const i = program.indexOf("~>");
     }
 
     switch (program[0]) {
@@ -124,7 +127,7 @@ export const tokenizer: Tokenizer<string> = async function* (program) {
         const i = program.search(irregularCharactersRegExp);
 
         if (i === -1) {
-          const number = toNumber(program);
+          const number = parseNumber(program);
           yield number === null
             ? { type: "EXECUTABLE_NAME", value: program }
             : { type: "NUMBER", value: number };
@@ -132,7 +135,7 @@ export const tokenizer: Tokenizer<string> = async function* (program) {
         }
 
         const literal = program.slice(0, i);
-        const number = toNumber(literal);
+        const number = parseNumber(literal);
         yield number === null
           ? { type: "EXECUTABLE_NAME", value: literal }
           : { type: "NUMBER", value: number };

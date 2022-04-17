@@ -14,8 +14,7 @@ const helloWorld = `
 font setfont
 100 100 moveto
 (Hello World!) show
-showpage
-`;
+showpage`;
 
 it("tokenizer", async () => {
   const list: Token[] = [];
