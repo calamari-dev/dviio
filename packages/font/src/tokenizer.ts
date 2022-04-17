@@ -1,3 +1,4 @@
+import { decodeAscii85 } from "./decodeAscii85";
 import { parseNumber } from "./parseNumber";
 import { Tokenizer } from "./types";
 import { unescape } from "./unescape";
@@ -12,8 +13,22 @@ export const tokenizer: Tokenizer<string> = async function* (program) {
       break;
     }
 
-    if (program[0] === "<" && program[1] === "~") {
+    if (program.startsWith("<~")) {
       const i = program.indexOf("~>");
+
+      if (i === -1) {
+        throw new Error();
+      }
+
+      const value = decodeAscii85(program.slice(2, i));
+
+      if (value === null) {
+        throw new Error();
+      }
+
+      yield { type: "STRING", value };
+      program = program.slice(i + 2);
+      continue;
     }
 
     switch (program[0]) {
