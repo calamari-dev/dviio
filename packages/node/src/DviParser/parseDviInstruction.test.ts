@@ -46,7 +46,7 @@ describe("parseDviInstruction", () => {
       byteLength: 45,
       inst: {
         name: "BOP",
-        bopPointer: -1,
+        bopPosition: -1,
         count: [1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
       },
     });
@@ -135,7 +135,7 @@ describe("parseDviInstruction", () => {
       byteLength: 29,
       inst: {
         name: "POST",
-        bopPointer: 42,
+        bopPosition: 42,
         numer: 25400000,
         denom: 473628672,
         mag: 1000,
@@ -150,7 +150,7 @@ describe("parseDviInstruction", () => {
   it("POST_POST", async () => {
     expect(await parseDviInstruction(handle, 0x2da, buffer)).toEqual({
       byteLength: 6,
-      inst: { name: "POST_POST", version: 2, postPointer: 621 },
+      inst: { name: "POST_POST", version: 2, postPosition: 621 },
     });
   });
 });

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type {
   ExtendedInstruction,
   ParserInstruction,
@@ -45,18 +46,20 @@ export type Initializer<Draft, Ext = unknown> =
 
 export type ParserConstructor<
   Input,
-  Pointer,
+  Position,
   Inst extends ExtendedInstruction = never
-> = { new (input: Input): Parser<Pointer, Inst> };
+> = {
+  new (...args: any[]): Parser<Position, Inst>;
+  create: (input: Input) => Promise<Parser<Position, Inst>>;
+};
 
-export type Parser<Pointer, Inst extends ExtendedInstruction = never> = {
-  init?(): Promise<unknown>;
+export type Parser<Position, Inst extends ExtendedInstruction = never> = {
   finally?(): Promise<unknown>;
-  getPrePointer(): Promise<Pointer>;
-  getPostPostPointer(): Promise<Pointer>;
-  parse(pointer: Pointer): Promise<{
-    inst: Inst | ParserInstruction<Pointer>;
-    next: Pointer;
+  getPrePosition(): Promise<Position>;
+  getPostPostPosition(): Promise<Position>;
+  parse(pointer: Position): Promise<{
+    inst: Inst | ParserInstruction<Position>;
+    next: Position;
   }>;
 };
 
@@ -64,14 +67,16 @@ export type LoaderConstructor<
   Ext = unknown,
   Asset = unknown,
   Inst extends ExtendedInstruction = never
-> = { new (): Loader<Ext, Asset, Inst> };
+> = {
+  new (...args: any[]): Loader<Ext, Asset, Inst>;
+  create: () => Promise<Loader<Ext, Asset, Inst>>;
+};
 
 export type Loader<
   Ext = unknown,
   Asset = unknown,
   Inst extends ExtendedInstruction = never
 > = {
-  init?(): Promise<unknown>;
   finally?(): Promise<unknown>;
   reduce(
     inst: Inst | ReducerInstruction,

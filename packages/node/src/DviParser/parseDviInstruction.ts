@@ -83,7 +83,7 @@ export const parseDviInstruction = async (
 
     return {
       byteLength: 45,
-      inst: { name: "BOP", bopPointer: buffer.readInt32BE(40), count },
+      inst: { name: "BOP", bopPosition: buffer.readInt32BE(40), count },
     };
   }
 
@@ -279,7 +279,7 @@ export const parseDviInstruction = async (
       byteLength: 29,
       inst: {
         name: "POST",
-        bopPointer: buffer.readUint32BE(0),
+        bopPosition: buffer.readUint32BE(0),
         numer: buffer.readUint32BE(4),
         denom: buffer.readUint32BE(8),
         mag: buffer.readUint32BE(12),
@@ -299,7 +299,7 @@ export const parseDviInstruction = async (
       byteLength: 6,
       inst: {
         name: "POST_POST",
-        postPointer: buffer.readUint32BE(0),
+        postPosition: buffer.readUint32BE(0),
         version: buffer.readUint8(4),
       },
     };

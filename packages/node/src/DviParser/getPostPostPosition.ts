@@ -1,6 +1,6 @@
 import type { FileHandle } from "fs/promises";
 
-export const getPostPostPointer = async (
+export const getPostPostPosition = async (
   handle: FileHandle,
   buffer: Buffer
 ): Promise<number> => {

@@ -2,15 +2,12 @@ export const decodeAscii85 = (x: string): string | null => {
   x = x.replace(/\s/g, "");
   let result = "";
 
-  while (x.length > 0) {
-    if (x[0] === "z") {
-      x = "!!!!!" + x.slice(1);
-    }
-
+  for (let pos = 0; pos < x.length; pos += 5) {
+    const m = Math.min(x.length, pos + 5);
     let k = 0;
 
-    for (let i = 0; i < x.length && i < 5; i++) {
-      const c = x[i].charCodeAt(0);
+    for (let i = pos; i < m; i++) {
+      const c = x.charCodeAt(i);
 
       if (c < 33 || c > 117) {
         return null;
@@ -19,11 +16,11 @@ export const decodeAscii85 = (x: string): string | null => {
       k = k * 85 + c - 33;
     }
 
-    for (let i = x.length; i < 5; i++) {
+    for (let i = m - pos; i < 5; i++) {
       k = k * 85 + 84;
     }
 
-    for (let i = x.length; i < 5; i++) {
+    for (let i = m - pos; i < 5; i++) {
       k >>= 8;
     }
 
@@ -41,7 +38,6 @@ export const decodeAscii85 = (x: string): string | null => {
     }
 
     result += s;
-    x = x.slice(5);
   }
 
   return result;

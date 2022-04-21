@@ -33,11 +33,10 @@ export const dviio = <
       throw new Error("Given page is invalid.");
     }
 
-    const parser = new $preset.parser(input);
-    const loader = $preset?.loader && new $preset.loader();
+    const parser = await $preset.parser.create(input);
+    const loader = await $preset?.loader?.create();
 
     try {
-      await Promise.all([parser.init?.(), loader?.init?.()]);
       const procedure = createParseProcedure(parser, normalized, plugin);
       let state = createState($preset.initializer);
 

@@ -2,73 +2,73 @@ import type { ExtendedInstruction, ParserInstruction } from "./instruction";
 import type { Parser, Plugin } from "./types";
 
 export const createParseProcedure = async function* <
-  Pointer,
+  Position,
   Inst extends ExtendedInstruction = never
 >(
-  parser: Parser<Pointer, Inst>,
+  parser: Parser<Position, Inst>,
   page: [number, ...number[]] | { start: number; end: number },
   plugin: Plugin
 ): AsyncGenerator<Inst | ParserInstruction> {
-  const prePointer = await parser.getPrePointer();
-  yield (await parser.parse(prePointer)).inst;
+  const prePosition = await parser.getPrePosition();
+  yield (await parser.parse(prePosition)).inst;
 
-  let bopPointer = null as unknown as Pointer;
+  let bopPosition = null as unknown as Position;
   let totalPages = 0;
 
   postamble: {
-    let pointer: Pointer = await parser.getPostPostPointer();
+    let position: Position = await parser.getPostPostPosition();
     let hasPostPostVisited = false;
 
     while (1) {
-      const { inst, next } = await parser.parse(pointer);
+      const { inst, next } = await parser.parse(position);
 
       switch (inst.name) {
         case "POST": {
           yield inst;
-          bopPointer = inst.bopPointer;
+          bopPosition = inst.bopPosition;
           totalPages = inst.totalPages;
-          pointer = next;
+          position = next;
           continue;
         }
 
         case "POST_POST": {
           if (hasPostPostVisited) {
-            pointer = inst.postPointer;
+            position = inst.postPosition;
             break postamble;
           }
 
           yield inst;
           hasPostPostVisited = true;
-          pointer = inst.postPointer;
+          position = inst.postPosition;
           continue;
         }
 
         default: {
           yield inst;
-          pointer = next;
+          position = next;
         }
       }
     }
   }
 
-  const bopPointers: Pointer[] = [];
+  const bopPositions: Position[] = [];
 
   predocument: {
-    let pointer = bopPointer;
+    let position = bopPosition;
 
     if (!Array.isArray(page)) {
       for (let p = totalPages; p >= page.start; p--) {
-        const { inst } = await parser.parse(pointer);
+        const { inst } = await parser.parse(position);
 
         if (inst.name !== "BOP") {
           throw new Error("This input is illegal.");
         }
 
         if (p >= page.start && p <= page.end) {
-          bopPointers.push(pointer);
+          bopPositions.push(position);
         }
 
-        pointer = inst.bopPointer;
+        position = inst.bopPosition;
       }
 
       break predocument;
@@ -78,47 +78,47 @@ export const createParseProcedure = async function* <
     page = [...page];
 
     for (let p = totalPages; p >= firstPage; p--) {
-      const { inst } = await parser.parse(pointer);
+      const { inst } = await parser.parse(position);
 
       if (inst.name !== "BOP") {
         throw new Error("This input is illegal.");
       }
 
       if (p === page[page.length - 1]) {
-        bopPointers.push(pointer);
+        bopPositions.push(position);
       }
 
-      pointer = inst.bopPointer;
+      position = inst.bopPosition;
     }
   }
 
-  let pointer = bopPointers[bopPointers.length - 1];
+  let position = bopPositions[bopPositions.length - 1];
 
   while (1) {
-    const { inst, next } = await parser.parse(pointer);
+    const { inst, next } = await parser.parse(position);
 
     switch (inst.name) {
       case "EOP": {
         yield inst;
 
-        if (bopPointers.length === 1) {
+        if (bopPositions.length === 1) {
           return;
         }
 
-        bopPointers.pop();
-        pointer = bopPointers[bopPointers.length - 1];
+        bopPositions.pop();
+        position = bopPositions[bopPositions.length - 1];
         continue;
       }
 
       case "XXX": {
         yield plugin(inst) ?? inst;
-        pointer = next;
+        position = next;
         continue;
       }
 
       default: {
         yield inst;
-        pointer = next;
+        position = next;
       }
     }
   }

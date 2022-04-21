@@ -8,9 +8,9 @@ export type ReducerInstruction = BasicReducerInstruction | SpecialInstruction;
 
 export type BasicParserInstruction<Pointer = unknown> =
   | Exclude<BasicReducerInstruction, { name: "BOP" | "POST" | "POST_POST" }>
-  | (BasicReducerInstruction & { name: "BOP"; bopPointer: Pointer })
-  | (BasicReducerInstruction & { name: "POST"; bopPointer: Pointer })
-  | (BasicReducerInstruction & { name: "POST_POST"; postPointer: Pointer });
+  | (BasicReducerInstruction & { name: "BOP"; bopPosition: Pointer })
+  | (BasicReducerInstruction & { name: "POST"; bopPosition: Pointer })
+  | (BasicReducerInstruction & { name: "POST_POST"; postPosition: Pointer });
 
 export type BasicReducerInstruction =
   | { name: "SET"; codePoint: number }

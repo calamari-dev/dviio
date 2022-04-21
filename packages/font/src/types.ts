@@ -1,6 +1,9 @@
-export type Tokenizer<Input> = (input: Input) => AsyncGenerator<Token, void>;
+export type Tokenizer<Code> = (code: Code) => AsyncGenerator<Token, void>;
 
-export type Token = { type: "COMMENT" } | PrimitiveToken | DelimiterToken;
+export type Token =
+  | PrimitiveToken
+  | DelimiterToken
+  | { type: "COMMENT"; value: string };
 
 export type PrimitiveToken =
   | { type: "NUMBER"; value: number }

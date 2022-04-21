@@ -1,5 +1,5 @@
 import { Preset, createState } from "@dviio/base";
-import { DumpDraft, dviDumpReducer, buildYaml } from "@dviio/common";
+import { DumpDraft, dviDumpReducer, buildYaml } from "@dviio/dump";
 import { DviParser } from "./DviParser";
 
 const { numer, denom, mag } = createState({ draft: 0, extension: 0 });
