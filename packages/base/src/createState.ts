@@ -1,8 +1,6 @@
 import type { Initializer, State } from "./types";
 
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-expect-error
-import _structuredClone from "core-js-pure/actual/structured-clone";
+import { structuredClone } from "./structuredClone";
 
 export const createState = <Draft, Ext>(
   init: Initializer<Draft, Ext>
@@ -17,5 +15,3 @@ export const createState = <Draft, Ext>(
     fonts: {},
   };
 };
-
-const structuredClone: <T>(x: T) => T = _structuredClone;

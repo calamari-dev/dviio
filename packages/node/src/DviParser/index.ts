@@ -9,8 +9,7 @@ export const DviParser: ParserConstructor<string, number> = class {
   constructor(private handle: FileHandle) {}
 
   static async create(path: string) {
-    const handle = await open(path, "r");
-    return new DviParser(handle);
+    return new DviParser(await open(path, "r"));
   }
 
   finally() {
@@ -25,13 +24,13 @@ export const DviParser: ParserConstructor<string, number> = class {
     return getPostPostPosition(this.handle, this.buffer);
   }
 
-  async parse(pointer: number): ReturnType<Parser<number>["parse"]> {
+  async parse(position: number): ReturnType<Parser<number>["parse"]> {
     const { byteLength, inst } = await parseDviInstruction(
       this.handle,
-      pointer,
+      position,
       this.buffer
     );
 
-    return { next: pointer + byteLength, inst };
+    return { next: position + byteLength, inst };
   }
 };

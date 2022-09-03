@@ -1,9 +1,13 @@
-import type { Loader } from "@dviio/base";
+import type { Loader, LoaderConstructor } from "@dviio/base";
 import { promisify } from "util";
 import { execFile } from "child_process";
 import path from "path";
 
-export class TfmLoader implements Loader {
+export const TfmLoader: LoaderConstructor = class {
+  static async create() {
+    return new TfmLoader();
+  }
+
   reduce: Loader["reduce"] = async (inst, state) => {
     if (inst.name !== "FNT_DEF") {
       return state;
@@ -22,6 +26,10 @@ export class TfmLoader implements Loader {
 
     return state;
   };
-}
+
+  getAsset = () => {
+    return Promise.resolve();
+  };
+};
 
 const execute = promisify(execFile);

@@ -4,6 +4,7 @@ import { combinePlugins } from "./combinePlugins";
 import { normalizePageSpec } from "./normalizePageSpec";
 import { createState } from "./createState";
 import { createParseProcedure } from "./createParseProcedure";
+import { structuredClone } from "./structuredClone";
 
 export const dviio = <
   Input,
@@ -22,22 +23,22 @@ export const dviio = <
   const plugin = combinePlugins(...plugins);
 
   if (typeof $preset.initializer !== "function") {
-    const { draft, extension } = createState($preset.initializer);
+    const { draft, extension } = structuredClone($preset.initializer);
     $preset.initializer = { draft, extension };
   }
 
-  return async (input: Input, pages: PageSpec = "*"): Promise<Output> => {
-    const normalized = normalizePageSpec(pages);
+  return async (input: Input, spec: PageSpec = "*"): Promise<Output> => {
+    const pageSpec = normalizePageSpec(spec);
 
-    if (normalized === null) {
-      throw new Error("Given page is invalid.");
+    if (pageSpec === null) {
+      throw new Error("Given page spec is invalid.");
     }
 
     const parser = await $preset.parser.create(input);
     const loader = await $preset?.loader?.create();
 
     try {
-      const procedure = createParseProcedure(parser, normalized, plugin);
+      const procedure = createParseProcedure(parser, pageSpec, plugin);
       let state = createState($preset.initializer);
 
       for await (const inst of procedure) {

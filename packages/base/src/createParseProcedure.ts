@@ -6,7 +6,7 @@ export const createParseProcedure = async function* <
   Inst extends ExtendedInstruction = never
 >(
   parser: Parser<Position, Inst>,
-  page: [number, ...number[]] | { start: number; end: number },
+  pageSpec: (page: number) => boolean,
   plugin: Plugin
 ): AsyncGenerator<Inst | ParserInstruction> {
   const prePosition = await parser.getPrePosition();
@@ -16,31 +16,30 @@ export const createParseProcedure = async function* <
   let totalPages = 0;
 
   postamble: {
-    let position: Position = await parser.getPostPostPosition();
-    let hasPostPostVisited = false;
+    const postPostPosition = await parser.getPostPostPosition();
+    const { inst: postPostInst } = await parser.parse(postPostPosition);
 
-    while (1) {
+    if (postPostInst.name !== "POST_POST") {
+      throw new Error();
+    }
+
+    const { postPosition } = postPostInst;
+    const { inst: postInst, next } = await parser.parse(postPosition);
+
+    if (postInst.name !== "POST") {
+      throw new Error();
+    }
+
+    let position = next;
+    bopPosition = postInst.bopPosition;
+    totalPages = postInst.totalPages;
+
+    while (true) {
       const { inst, next } = await parser.parse(position);
 
       switch (inst.name) {
-        case "POST": {
-          yield inst;
-          bopPosition = inst.bopPosition;
-          totalPages = inst.totalPages;
-          position = next;
-          continue;
-        }
-
         case "POST_POST": {
-          if (hasPostPostVisited) {
-            position = inst.postPosition;
-            break postamble;
-          }
-
-          yield inst;
-          hasPostPostVisited = true;
-          position = inst.postPosition;
-          continue;
+          break postamble;
         }
 
         default: {
@@ -53,48 +52,23 @@ export const createParseProcedure = async function* <
 
   const bopPositions: Position[] = [];
 
-  predocument: {
-    let position = bopPosition;
+  for (let p = totalPages; p > 0; p--) {
+    const { inst } = await parser.parse(bopPosition);
 
-    if (!Array.isArray(page)) {
-      for (let p = totalPages; p >= page.start; p--) {
-        const { inst } = await parser.parse(position);
-
-        if (inst.name !== "BOP") {
-          throw new Error("This input is illegal.");
-        }
-
-        if (p >= page.start && p <= page.end) {
-          bopPositions.push(position);
-        }
-
-        position = inst.bopPosition;
-      }
-
-      break predocument;
+    if (inst.name !== "BOP") {
+      throw new Error("This input is illegal.");
     }
 
-    const firstPage = page[0];
-    page = [...page];
-
-    for (let p = totalPages; p >= firstPage; p--) {
-      const { inst } = await parser.parse(position);
-
-      if (inst.name !== "BOP") {
-        throw new Error("This input is illegal.");
-      }
-
-      if (p === page[page.length - 1]) {
-        bopPositions.push(position);
-      }
-
-      position = inst.bopPosition;
+    if (pageSpec(p)) {
+      bopPositions.push(bopPosition);
     }
+
+    bopPosition = inst.bopPosition;
   }
 
   let position = bopPositions[bopPositions.length - 1];
 
-  while (1) {
+  while (true) {
     const { inst, next } = await parser.parse(position);
 
     switch (inst.name) {

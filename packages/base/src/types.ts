@@ -11,7 +11,8 @@ export type PageSpec =
   | number
   | number[]
   | Set<number>
-  | { start?: number; end?: number };
+  | { start?: number; end?: number }
+  | ((page: number) => boolean);
 
 export type Preset<
   Input,

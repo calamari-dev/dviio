@@ -1,35 +1,32 @@
 import type { PageSpec } from "./types";
 
 export const normalizePageSpec = (
-  pages: PageSpec
-): { start: number; end: number } | [number, ...number[]] | null => {
-  switch (typeof pages) {
+  spec: PageSpec
+): ((page: number) => boolean) | null => {
+  switch (typeof spec) {
+    case "function":
+      return spec;
+
     case "string":
-      return { start: 1, end: Infinity };
+      return isNatural;
 
     case "number":
-      return isNatural(pages) ? [pages] : null;
+      return !isNatural(spec) ? null : (x) => x === spec;
   }
 
-  if (Array.isArray(pages) || pages instanceof Set) {
-    const set = new Set(pages);
-    set.delete(undefined as unknown as number);
-    const result = [...set].filter(isNatural).sort(subtract);
+  if (Array.isArray(spec) || spec instanceof Set) {
+    const set = new Set<number>();
 
-    switch (result.length) {
-      case 0:
-        return null;
-
-      case 1:
-        return result as [number];
+    for (const page of spec) {
+      if (isNatural(page)) {
+        set.add(page);
+      }
     }
 
-    return result.length - 1 === result[result.length - 1] - result[0]
-      ? { start: result[0], end: result[result.length - 1] }
-      : (result as [number, ...number[]]);
+    return set.size === 0 ? null : (page) => set.has(page);
   }
 
-  let { start = 1, end = Infinity } = pages;
+  let { start = 1, end = Infinity } = spec;
   start = Math.max(Math.ceil(start), 1);
   end = Math.floor(end);
 
@@ -37,8 +34,7 @@ export const normalizePageSpec = (
     return null;
   }
 
-  return start === end ? [start] : { start, end };
+  return (page) => isNatural(page) && page >= start && page <= end;
 };
 
-const isNatural = (page: number) => page > 0 && Number.isSafeInteger(page);
-const subtract = (x: number, y: number) => x - y;
+const isNatural = (page: number) => page > 0 && Number.isInteger(page);
